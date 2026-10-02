@@ -1,8 +1,8 @@
-// A few hundred dots wired up like neurons. Each dot collects input; when it
-// crosses a threshold it fires, rests for a moment, and sends signals along its
-// connections. Signals that arrive add input to the next dot, so activity can
-// spread. The cursor (or a finger) excites dots nearby; a click or tap makes a
-// whole cluster fire in a ripple. Colours come from the site's theme tokens.
+// A few hundred dots wired up like neurons. Nothing happens on its own: dots
+// only light up where the cursor (or a finger) passes. A lit dot glows in a
+// colour that depends on where it sits, so the field forms a slow rainbow, and
+// it passes a little light along its connections to its neighbours before
+// everything fades back. A click or tap lights a whole patch in a ripple.
 (function () {
   var canvas = document.querySelector(".lab-canvas");
   if (!canvas) return;
@@ -10,16 +10,15 @@
   var counter = document.querySelector(".lab-count");
   var reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  var THRESHOLD = 1;
-  var SIGNAL_WEIGHT = 0.46; // input a dot gets when a signal arrives
-  var LEAK_MS = 420; // how fast collected input fades
-  var REST_MS = 520; // refractory period after firing
-  var SIGNAL_SPEED = 0.22; // pixels per millisecond
-  var SPONTANEOUS = reduceMotion ? 0 : 0.015; // fires per dot per second
-  var REACH = 110; // cursor radius
-  var MAX_SIGNALS = 1600;
+  var FADE_MS = 4200; // how long a glow takes to fade
+  var FIRE_AT = 0.55; // energy at which a dot passes light to its neighbours
+  var REST_MS = 3000; // a dot passes light on at most once in this time
+  var SIGNAL_SPEED = 0.045; // pixels per millisecond
+  var SIGNAL_GIFT = 0.18; // energy a neighbour receives from an arriving signal
+  var REACH = 120; // cursor radius
+  var MAX_SIGNALS = 900;
 
-  var W, H, nodes, signals, colors = {}, spikes = 0, last = 0;
+  var W, H, nodes, signals, colors = {}, dark = false, lit = 0, last = 0;
   var pointer = { x: -1e4, y: -1e4, speed: 0, inside: false };
 
   function readColors() {
@@ -27,6 +26,16 @@
     ["paper", "ink", "muted", "rule", "accent"].forEach(function (k) {
       colors[k] = style.getPropertyValue("--" + k).trim();
     });
+    dark = colors.paper.toLowerCase() !== "#f5f3ee";
+  }
+
+  // The hue comes from a dot's position and drifts very slowly over time.
+  function hue(n, now) {
+    return (n.ax / W) * 300 + (n.ay / H) * 60 + now * 0.002;
+  }
+
+  function hsla(h, a) {
+    return "hsla(" + (h % 360) + "," + (dark ? "85%,64%," : "78%,52%,") + a + ")";
   }
 
   function build() {
@@ -37,183 +46,190 @@
     canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    // A jittered grid spreads the dots evenly without looking like a grid.
-    var target = Math.max(70, Math.min(420, Math.round((W * H) / 5000)));
+    var target = Math.max(70, Math.min(400, Math.round((W * H) / 5200)));
     var cols = Math.max(4, Math.round(Math.sqrt((target * W) / H)));
     var rows = Math.max(4, Math.round(target / cols));
     var cw = W / cols, ch = H / rows;
     nodes = [];
     for (var r = 0; r < rows; r++) {
       for (var c = 0; c < cols; c++) {
-        var ax = (c + 0.5 + (Math.random() - 0.5) * 0.85) * cw;
-        var ay = (r + 0.5 + (Math.random() - 0.5) * 0.85) * ch;
+        var ax = (c + 0.5 + (Math.random() - 0.5) * 0.9) * cw;
+        var ay = (r + 0.5 + (Math.random() - 0.5) * 0.9) * ch;
         nodes.push({
           i: nodes.length, ax: ax, ay: ay, x: ax, y: ay,
+          size: 1.1 + Math.random() * 1.3,
           phase: Math.random() * Math.PI * 2,
-          freq: 0.00015 + Math.random() * 0.0002,
-          amp: reduceMotion ? 0 : 2 + Math.random() * 5,
-          v: 0, restUntil: 0, glow: 0, due: 0, links: []
+          freq: 0.00003 + Math.random() * 0.00004,
+          amp: reduceMotion ? 0 : 3 + Math.random() * 6,
+          energy: 0, restUntil: 0, due: 0, links: [],
+          bend: (Math.random() - 0.5) * 0.35
         });
       }
     }
 
-    // Connect each dot to its three nearest neighbours (both ways).
     var maxDist = Math.max(cw, ch) * 2.2;
     nodes.forEach(function (n) {
-      var near = nodes
+      nodes
         .filter(function (m) { return m !== n; })
         .map(function (m) { return { m: m, d: Math.hypot(m.ax - n.ax, m.ay - n.ay) }; })
         .filter(function (o) { return o.d < maxDist; })
         .sort(function (p, q) { return p.d - q.d; })
-        .slice(0, 3);
-      near.forEach(function (o) {
-        if (n.links.indexOf(o.m) < 0) n.links.push(o.m);
-        if (o.m.links.indexOf(n) < 0) o.m.links.push(n);
-      });
+        .slice(0, 3)
+        .forEach(function (o) {
+          if (n.links.indexOf(o.m) < 0) n.links.push(o.m);
+          if (o.m.links.indexOf(n) < 0) o.m.links.push(n);
+        });
     });
     signals = [];
   }
 
-  function fire(n, now) {
+  // Connections are drawn as gentle curves rather than straight lines.
+  function curvePoint(a, b, t) {
+    var mx = (a.x + b.x) / 2 - (b.y - a.y) * a.bend;
+    var my = (a.y + b.y) / 2 + (b.x - a.x) * a.bend;
+    var u = 1 - t;
+    return { x: u * u * a.x + 2 * u * t * mx + t * t * b.x, y: u * u * a.y + 2 * u * t * my + t * t * b.y };
+  }
+
+  function strokeCurve(a, b) {
+    var mx = (a.x + b.x) / 2 - (b.y - a.y) * a.bend;
+    var my = (a.y + b.y) / 2 + (b.x - a.x) * a.bend;
+    ctx.moveTo(a.x, a.y);
+    ctx.quadraticCurveTo(mx, my, b.x, b.y);
+  }
+
+  function passOn(n, now) {
     if (now < n.restUntil) return;
     n.restUntil = now + REST_MS;
-    n.v = 0;
-    n.glow = 1;
-    spikes++;
+    lit++;
     for (var k = 0; k < n.links.length && signals.length < MAX_SIGNALS; k++) {
       var m = n.links[k];
-      signals.push({ a: n, b: m, t: 0, len: Math.hypot(m.x - n.x, m.y - n.y) || 1 });
+      signals.push({ a: n, b: m, t: 0, len: Math.hypot(m.x - n.x, m.y - n.y) * 1.1 || 1, hue: hue(n, now) });
     }
   }
 
   function step(now) {
     var dt = Math.min(now - (last || now), 50);
     last = now;
-    var leak = Math.exp(-dt / LEAK_MS);
+    var fade = Math.exp(-dt / FADE_MS);
 
     nodes.forEach(function (n) {
       n.x = n.ax + Math.sin(now * n.freq + n.phase) * n.amp;
       n.y = n.ay + Math.cos(now * n.freq * 0.8 + n.phase * 1.3) * n.amp;
-      n.v *= leak;
-      n.glow = Math.max(0, n.glow - dt / 900);
+      n.energy *= fade;
 
       if (n.due && now >= n.due) {
         n.due = 0;
-        fire(n, now);
+        n.energy = Math.min(1, n.energy + 0.9);
       }
       if (pointer.inside) {
         var d = Math.hypot(n.x - pointer.x, n.y - pointer.y);
         if (d < REACH) {
-          n.v += (1 - d / REACH) * (0.5 + Math.min(pointer.speed, 2.5)) * dt * 0.01;
+          var closeness = 1 - d / REACH;
+          n.energy = Math.min(1, n.energy + closeness * closeness * (0.3 + Math.min(pointer.speed, 2)) * dt * 0.0022);
         }
       }
-      if (Math.random() < SPONTANEOUS * dt * 0.001) n.v += THRESHOLD;
-      if (n.v >= THRESHOLD) fire(n, now);
+      if (n.energy >= FIRE_AT) passOn(n, now);
     });
-    pointer.speed *= Math.exp(-dt / 120);
+    pointer.speed *= Math.exp(-dt / 200);
 
     for (var i = signals.length - 1; i >= 0; i--) {
       var s = signals[i];
       s.t += (SIGNAL_SPEED * dt) / s.len;
       if (s.t >= 1) {
-        if (now >= s.b.restUntil) s.b.v += SIGNAL_WEIGHT;
+        s.b.energy = Math.min(1, s.b.energy + SIGNAL_GIFT);
         signals.splice(i, 1);
       }
     }
   }
 
-  function draw() {
+  function draw(now) {
+    ctx.globalCompositeOperation = "source-over";
     ctx.fillStyle = colors.paper;
     ctx.fillRect(0, 0, W, H);
 
-    // Connections: faint everywhere, a little clearer around the cursor.
+    // Resting connections.
     ctx.lineWidth = 1;
     ctx.strokeStyle = colors.rule;
     ctx.beginPath();
     nodes.forEach(function (n) {
       n.links.forEach(function (m) {
-        if (m.i > n.i) {
-          ctx.moveTo(n.x, n.y);
-          ctx.lineTo(m.x, m.y);
-        }
+        if (m.i > n.i) strokeCurve(n, m);
       });
     });
     ctx.stroke();
 
-    if (pointer.inside) {
-      ctx.strokeStyle = colors.muted;
-      nodes.forEach(function (n) {
-        n.links.forEach(function (m) {
-          if (m.i < n.i) return;
-          var d = Math.hypot((n.x + m.x) / 2 - pointer.x, (n.y + m.y) / 2 - pointer.y);
-          if (d > REACH * 1.6) return;
-          ctx.globalAlpha = (1 - d / (REACH * 1.6)) * 0.55;
-          ctx.beginPath();
-          ctx.moveTo(n.x, n.y);
-          ctx.lineTo(m.x, m.y);
-          ctx.stroke();
-        });
-      });
-      ctx.globalAlpha = 1;
-    }
-
-    // Signals travelling along connections, drawn as short streaks.
-    ctx.strokeStyle = colors.accent;
-    ctx.lineWidth = 1.6;
-    ctx.lineCap = "round";
-    ctx.beginPath();
-    signals.forEach(function (s) {
-      var t0 = Math.max(0, s.t - 18 / s.len);
-      ctx.moveTo(s.a.x + (s.b.x - s.a.x) * t0, s.a.y + (s.b.y - s.a.y) * t0);
-      ctx.lineTo(s.a.x + (s.b.x - s.a.x) * s.t, s.a.y + (s.b.y - s.a.y) * s.t);
-    });
-    ctx.stroke();
-
-    // Dots, swelling slightly as they charge; a ring spreads out when one fires.
+    // Soft glows first, so dots and lines sit on top of them.
+    ctx.globalCompositeOperation = dark ? "lighter" : "multiply";
     nodes.forEach(function (n) {
-      ctx.fillStyle = colors.muted;
+      if (n.energy < 0.02) return;
+      var radius = 8 + n.energy * 34;
+      var g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, radius);
+      var h = hue(n, now);
+      g.addColorStop(0, hsla(h, n.energy * (dark ? 0.45 : 0.35)));
+      g.addColorStop(1, hsla(h, 0));
+      ctx.fillStyle = g;
       ctx.beginPath();
-      ctx.arc(n.x, n.y, 1.5 + Math.min(n.v, 1) * 1.6, 0, Math.PI * 2);
+      ctx.arc(n.x, n.y, radius, 0, Math.PI * 2);
       ctx.fill();
-      if (n.glow > 0) {
-        ctx.globalAlpha = n.glow;
-        ctx.fillStyle = colors.accent;
+    });
+    ctx.globalCompositeOperation = "source-over";
+
+    // Connections between lit dots take on their colour.
+    ctx.lineWidth = 1.2;
+    nodes.forEach(function (n) {
+      n.links.forEach(function (m) {
+        if (m.i < n.i) return;
+        var e = (n.energy + m.energy) / 2;
+        if (e < 0.05) return;
+        ctx.strokeStyle = hsla(hue(n, now), Math.min(e * 1.2, 0.9));
         ctx.beginPath();
-        ctx.arc(n.x, n.y, 3.2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = colors.accent;
-        ctx.lineWidth = 1;
-        ctx.globalAlpha = n.glow * 0.6;
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, 4 + (1 - n.glow) * 22, 0, Math.PI * 2);
+        strokeCurve(n, m);
         ctx.stroke();
-        ctx.globalAlpha = 1;
-      }
+      });
+    });
+
+    // Light travelling to neighbours, as short soft streaks along the curve.
+    ctx.lineCap = "round";
+    ctx.lineWidth = 2;
+    signals.forEach(function (s) {
+      var p0 = curvePoint(s.a, s.b, Math.max(0, s.t - 24 / s.len));
+      var p1 = curvePoint(s.a, s.b, s.t);
+      ctx.strokeStyle = hsla(s.hue, 0.85 * (1 - s.t * 0.5));
+      ctx.beginPath();
+      ctx.moveTo(p0.x, p0.y);
+      ctx.lineTo(p1.x, p1.y);
+      ctx.stroke();
+    });
+
+    // Dots: grey at rest, coloured and a little larger when lit.
+    nodes.forEach(function (n) {
+      ctx.fillStyle = n.energy > 0.05 ? hsla(hue(n, now), 0.4 + n.energy * 0.6) : colors.muted;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.size + n.energy * 2.2, 0, Math.PI * 2);
+      ctx.fill();
     });
   }
 
   function frame(now) {
     step(now);
-    draw();
+    draw(now);
     requestAnimationFrame(frame);
   }
 
-  // A click or tap fires every dot nearby, outward from the point like a ripple.
+  // A click or tap lights every dot nearby, outward from the point like a ripple.
   function burst(x, y) {
     var now = performance.now();
     nodes.forEach(function (n) {
       var d = Math.hypot(n.x - x, n.y - y);
-      if (d < REACH * 1.4) n.due = now + d * 2.2;
+      if (d < REACH * 1.6) n.due = now + d * 9;
     });
   }
 
   function setPointer(e) {
     var rect = canvas.getBoundingClientRect();
     var x = e.clientX - rect.left, y = e.clientY - rect.top;
-    if (pointer.inside) {
-      var moved = Math.hypot(x - pointer.x, y - pointer.y);
-      pointer.speed = Math.max(pointer.speed, moved / 16);
-    }
+    if (pointer.inside) pointer.speed = Math.max(pointer.speed, Math.hypot(x - pointer.x, y - pointer.y) / 16);
     pointer.x = x;
     pointer.y = y;
     pointer.inside = true;
@@ -235,12 +251,11 @@
     resizeTimer = setTimeout(build, 150);
   });
 
-  // Follow the theme toggle and the system setting.
   new MutationObserver(readColors).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", readColors);
 
   setInterval(function () {
-    if (counter) counter.textContent = spikes.toLocaleString(document.documentElement.lang);
+    if (counter) counter.textContent = lit.toLocaleString(document.documentElement.lang);
   }, 250);
 
   readColors();

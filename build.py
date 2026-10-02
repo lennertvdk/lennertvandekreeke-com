@@ -96,8 +96,11 @@ def site_nav(lang, indent="        "):
     return "\n".join(f'{indent}<a href="{PREFIX[lang]}{path}">{label}</a>' for path, label in NAV[lang])
 
 
+GOATCOUNTER = '  <script data-goatcounter="https://lennertvandekreeke-com.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>'
+
+
 def footer(lang, scripts=("theme.js",)):
-    tags = "\n".join(f'  <script src="{asset(s)}"></script>' for s in scripts)
+    tags = "\n".join(f'  <script src="{asset(s)}"></script>' for s in scripts) + "\n" + GOATCOUNTER
     return f"""  <footer>
     <nav class="footer-nav" aria-label="{UI[lang]["sections"]}">
 {site_nav(lang, "      ")}
@@ -861,7 +864,10 @@ PRIVACY = {
         ("Verantwortlich", [
             "Lennert van de Kreeke, Berlin. Erreichbar per E-Mail an {email} oder über das {form}."]),
         ("Kurz gesagt", [
-            "Diese Website setzt keine Cookies, nutzt keine Analyse- oder Tracking-Dienste und bindet keine Inhalte von Drittanbietern ein. Schriftarten und Bilder kommen von diesem Server. Daten fallen nur beim Hosting und, wenn du es nutzt, beim Kontaktformular an."]),
+            "Diese Website setzt keine Cookies und bindet keine Inhalte von Drittanbietern ein. Schriftarten und Bilder kommen von diesem Server. Daten fallen beim Hosting, bei einem einfachen Besucherzähler und, wenn du es nutzt, beim Kontaktformular an."]),
+        ("Besucherzähler", [
+            "Um zu sehen, welche Seiten gelesen werden, nutze ich GoatCounter ({goatcounter}). Beim Aufruf einer Seite lädt dein Browser ein kleines Skript von gc.zgo.at und meldet die aufgerufene Seite, die verweisende Seite, Browser, Betriebssystem, Bildschirmgröße und das ungefähre Land. GoatCounter setzt keine Cookies, speichert keine IP-Adressen und erstellt keine Profile; einzelne Besuchende lassen sich nicht wiedererkennen.",
+            "Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO; mein berechtigtes Interesse ist zu verstehen, wie die Website genutzt wird. Mehr dazu in der {goatcounter_privacy}."]),
         ("Hosting", [
             "Die Website wird über GitHub Pages bereitgestellt (GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA). Beim Aufruf verarbeitet GitHub technisch notwendige Daten wie deine IP-Adresse, Datum und Uhrzeit, die aufgerufene Seite und deinen Browser, um die Seite auszuliefern und die Sicherheit des Dienstes zu gewährleisten.",
             "Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO; mein berechtigtes Interesse ist eine sichere und funktionierende Website. Die Übermittlung in die USA stützt sich auf das EU-US Data Privacy Framework. Mehr dazu in der {github}."]),
@@ -880,7 +886,10 @@ PRIVACY = {
         ("Who is responsible", [
             "Lennert van de Kreeke, Berlin. You can reach me by email at {email} or through the {form}."]),
         ("In short", [
-            "This site sets no cookies, uses no analytics or tracking, and embeds nothing from third parties. Fonts and images come from this server. Data is only processed for hosting and, if you use it, the contact form."]),
+            "This site sets no cookies and embeds nothing from third parties. Fonts and images come from this server. Data is processed for hosting, a simple visitor counter and, if you use it, the contact form."]),
+        ("Visitor counter", [
+            "To see which pages get read, I use GoatCounter ({goatcounter}). When you open a page, your browser loads a small script from gc.zgo.at and reports the page, the referring page, your browser, operating system, screen size and approximate country. GoatCounter sets no cookies, stores no IP addresses and builds no profiles; individual visitors can’t be recognised.",
+            "The legal basis is Art. 6(1)(f) GDPR; my legitimate interest is understanding how the site is used. See the {goatcounter_privacy}."]),
         ("Hosting", [
             "The site is served by GitHub Pages (GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA). When you visit, GitHub processes technically necessary data such as your IP address, the date and time, the page requested and your browser, to deliver the page and keep the service secure.",
             "The legal basis is Art. 6(1)(f) GDPR; my legitimate interest is a secure, working website. Transfers to the US rely on the EU-US Data Privacy Framework. See the {github}."]),
@@ -899,7 +908,10 @@ PRIVACY = {
         ("Verantwoordelijk", [
             "Lennert van de Kreeke, Berlijn. Je bereikt me per e-mail via {email} of via het {form}."]),
         ("Kort gezegd", [
-            "Deze website plaatst geen cookies, gebruikt geen analyse- of trackingdiensten en laadt geen inhoud van derden. Lettertypen en afbeeldingen komen van deze server. Er worden alleen gegevens verwerkt voor de hosting en, als je het gebruikt, het contactformulier."]),
+            "Deze website plaatst geen cookies en laadt geen inhoud van derden. Lettertypen en afbeeldingen komen van deze server. Er worden gegevens verwerkt voor de hosting, een eenvoudige bezoekersteller en, als je het gebruikt, het contactformulier."]),
+        ("Bezoekersteller", [
+            "Om te zien welke pagina’s gelezen worden, gebruik ik GoatCounter ({goatcounter}). Als je een pagina opent, laadt je browser een klein script van gc.zgo.at en meldt de pagina, de verwijzende pagina, je browser, besturingssysteem, schermgrootte en het land bij benadering. GoatCounter plaatst geen cookies, slaat geen IP-adressen op en maakt geen profielen; individuele bezoekers zijn niet te herkennen.",
+            "De rechtsgrond is art. 6 lid 1 sub f AVG; mijn gerechtvaardigd belang is begrijpen hoe de website gebruikt wordt. Zie de {goatcounter_privacy}."]),
         ("Hosting", [
             "De website wordt gehost via GitHub Pages (GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, VS). Bij een bezoek verwerkt GitHub technisch noodzakelijke gegevens zoals je IP-adres, datum en tijd, de opgevraagde pagina en je browser, om de pagina te leveren en de dienst veilig te houden.",
             "De rechtsgrond is art. 6 lid 1 sub f AVG; mijn gerechtvaardigd belang is een veilige, werkende website. De doorgifte naar de VS is gebaseerd op het EU-VS Data Privacy Framework. Zie de {github}."]),
@@ -917,11 +929,11 @@ PRIVACY = {
 }
 
 PRIVACY_LINKS = {
-    "de": dict(form="Kontaktformular", github="Datenschutzerklärung von GitHub", formspree="Datenschutzerklärung von Formspree",
+    "de": dict(form="Kontaktformular", github="Datenschutzerklärung von GitHub", formspree="Datenschutzerklärung von Formspree", goatcounter="Datenschutzerklärung von GoatCounter",
                authority="Berliner Beauftragten für Datenschutz und Informationsfreiheit"),
-    "en": dict(form="contact form", github="GitHub privacy statement", formspree="Formspree privacy policy",
+    "en": dict(form="contact form", github="GitHub privacy statement", formspree="Formspree privacy policy", goatcounter="GoatCounter privacy policy",
                authority="Berlin Commissioner for Data Protection and Freedom of Information"),
-    "nl": dict(form="contactformulier", github="privacyverklaring van GitHub", formspree="privacyverklaring van Formspree",
+    "nl": dict(form="contactformulier", github="privacyverklaring van GitHub", formspree="privacyverklaring van Formspree", goatcounter="privacyverklaring van GoatCounter",
                authority="Berlijnse toezichthouder voor gegevensbescherming (Berliner Beauftragte für Datenschutz und Informationsfreiheit)"),
 }
 
@@ -933,6 +945,8 @@ def privacy(lang):
         form=a(f"{PREFIX[lang]}contact/", l["form"]),
         github=a("https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement", l["github"]),
         formspree=a("https://formspree.io/legal/privacy-policy/", l["formspree"]),
+        goatcounter=a("https://www.goatcounter.com", "goatcounter.com"),
+        goatcounter_privacy=a("https://www.goatcounter.com/help/privacy", l["goatcounter"]),
         authority=a("https://www.datenschutz-berlin.de", l["authority"]),
     )
     body = "\n\n".join(
@@ -955,12 +969,13 @@ def lab():
     </div>
     <div class="lab-note">
       <h1>Lab</h1>
-      <p>A few hundred dots, wired up like neurons. Move over them to excite them, click or tap to make a cluster fire. Signals travel along the connections and sometimes set off the next ones.</p>
-      <p class="lab-meta"><span class="lab-count">0</span> spikes so far</p>
+      <p>A few hundred dots, wired up like neurons. They stay quiet until you move over them, then light up, pass a little of it on to their neighbours and slowly fade. Click or tap for a bigger burst.</p>
+      <p class="lab-meta"><span class="lab-count">0</span> dots lit so far</p>
     </div>
   </div>
   <script src="{asset("theme.js")}"></script>
   <script src="{asset("lab.js")}"></script>
+{GOATCOUNTER}
 </body>
 </html>
 """

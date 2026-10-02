@@ -49,7 +49,11 @@
         { clipPath: ["circle(0 at " + x + "px " + y + "px)", "circle(" + radius + "px at " + x + "px " + y + "px)"] },
         { duration: 550, easing: "cubic-bezier(0.4, 0, 0.2, 1)", pseudoElement: "::view-transition-new(root)" }
       );
-    }).catch(function () {}); // aborted, e.g. in a background tab; the theme is already switched
+    }).catch(function () {});
+    // A transition can be skipped (e.g. in a background tab); the theme is
+    // switched either way, so the rejections are not errors.
+    transition.finished.catch(function () {});
+    transition.updateCallbackDone.catch(function () {});
   });
 
   updateLabel();
