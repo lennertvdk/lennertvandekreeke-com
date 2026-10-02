@@ -1,5 +1,6 @@
 # Generates the static pages of lennertvandekreeke.com in English, German and Dutch.
 # Edit the text here, then run: python3 build.py
+import hashlib
 import os
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -8,6 +9,11 @@ PREFIX = {"en": "/", "de": "/de/", "nl": "/nl/"}
 FORMSPREE = "https://formspree.io/f/mjykqqog"
 YOUTUBE = "https://www.youtube.com/channel/UCMHHH4dOREJTJF_ySpgV7mA"
 PDF = "/cv/Lebenslauf_Lennert_van_de_Kreeke.pdf"
+
+def asset(name):
+    with open(os.path.join(ROOT, name), "rb") as f:
+        return f"/{name}?v={hashlib.md5(f.read()).hexdigest()[:8]}"
+
 
 UI = {
     "en": dict(to_dark="Switch to dark theme", to_light="Switch to light theme", updated="Last updated October 2026",
@@ -38,7 +44,7 @@ def head(lang, title, desc, page, noindex=False):
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="{asset('styles.css')}">
   <script>try{{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}}catch(e){{}}</script>
 </head>"""
 
@@ -68,11 +74,11 @@ def topbar(lang, page):
 
 
 def site_nav(lang, indent="        "):
-    return "\n".join(f'{indent}<a href="{PREFIX[lang]}{slug}/">{label}</a>' for slug, label in NAV[lang])
+    return "\n".join(f'{indent}<a href="{PREFIX[lang]}{path}">{label}</a>' for path, label in NAV[lang])
 
 
 def footer(lang, scripts=("theme.js",)):
-    tags = "\n".join(f'  <script src="/{s}"></script>' for s in scripts)
+    tags = "\n".join(f'  <script src="{asset(s)}"></script>' for s in scripts)
     return f"""  <footer>
     <nav class="footer-nav" aria-label="{UI[lang]["sections"]}">
 {site_nav(lang, "      ")}
@@ -111,25 +117,25 @@ def a(href, text):
 # ---------------------------------------------------------------- Site structure
 
 NAV = {
-    "en": [("about", "About"), ("organizing", "Organizing"), ("cv", "CV"), ("contact", "Contact")],
-    "de": [("about", "Über mich"), ("organizing", "Engagement"), ("cv", "Lebenslauf"), ("contact", "Kontakt")],
-    "nl": [("about", "Over mij"), ("organizing", "Organiseren"), ("cv", "CV"), ("contact", "Contact")],
+    "en": [("cv/#research", "Research"), ("organizing/", "Organizing"), ("cv/", "CV"), ("contact/", "Contact")],
+    "de": [("cv/#research", "Forschung"), ("organizing/", "Engagement"), ("cv/", "Lebenslauf"), ("contact/", "Kontakt")],
+    "nl": [("cv/#research", "Onderzoek"), ("organizing/", "Organiseren"), ("cv/", "CV"), ("contact/", "Contact")],
 }
 
 # The four "doors" under the hero on the landing page.
 DOORS = {
-    "en": [("about", "Research", "My doctorate in Zurich, the EPIsoDE study, and what I do outside medicine."),
-           ("organizing", "Organizing", "How PROZ, ALPS, PSNG and BPSA fit together, plus lectures and events."),
-           ("cv", "CV", "The full CV, with a PDF to download."),
-           ("contact", "Contact", "A form, plus Instagram and LinkedIn.")],
-    "de": [("about", "Forschung", "Meine Promotion in Zürich, die EPIsoDE-Studie und was ich außerhalb der Medizin mache."),
-           ("organizing", "Engagement", "Wie PROZ, ALPS, PSNG und BPSA zusammenhängen, dazu Vorträge und Veranstaltungen."),
-           ("cv", "Lebenslauf", "Der ausführliche Lebenslauf, auch als PDF."),
-           ("contact", "Kontakt", "Ein Formular, dazu Instagram und LinkedIn.")],
-    "nl": [("about", "Onderzoek", "Mijn promotie in Zürich, de EPIsoDE-studie en wat ik buiten de geneeskunde doe."),
-           ("organizing", "Organiseren", "Hoe PROZ, ALPS, PSNG en BPSA met elkaar samenhangen, plus lezingen en evenementen."),
-           ("cv", "CV", "Het volledige cv, ook als pdf."),
-           ("contact", "Contact", "Een formulier, plus Instagram en LinkedIn.")],
+    "en": [("cv/#research", "Research", "My doctorate in Zurich, the EPIsoDE study at Charité, and a paper in preparation."),
+           ("organizing/", "Organizing", "How PROZ, ALPS, PSNG and BPSA fit together, plus lectures and events."),
+           ("cv/", "CV", "The full CV, with a PDF to download."),
+           ("contact/", "Contact", "A form, plus Instagram and LinkedIn.")],
+    "de": [("cv/#research", "Forschung", "Meine Promotion in Zürich, die EPIsoDE-Studie an der Charité und ein Paper in Vorbereitung."),
+           ("organizing/", "Engagement", "Wie PROZ, ALPS, PSNG und BPSA zusammenhängen, dazu Vorträge und Veranstaltungen."),
+           ("cv/", "Lebenslauf", "Der ausführliche Lebenslauf, auch als PDF."),
+           ("contact/", "Kontakt", "Ein Formular, dazu Instagram und LinkedIn.")],
+    "nl": [("cv/#research", "Onderzoek", "Mijn promotie in Zürich, de EPIsoDE-studie aan de Charité en een artikel in voorbereiding."),
+           ("organizing/", "Organiseren", "Hoe PROZ, ALPS, PSNG en BPSA met elkaar samenhangen, plus lezingen en evenementen."),
+           ("cv/", "CV", "Het volledige cv, ook als pdf."),
+           ("contact/", "Contact", "Een formulier, plus Instagram en LinkedIn.")],
 }
 
 ABOUT = {"en": "About", "de": "Über mich", "nl": "Over mij"}
@@ -219,7 +225,7 @@ def subpage(lang, page, title, desc, lede, body, scripts=("theme.js",), body_cla
 
 def landing(lang):
     t = HOME[lang]
-    doors = "\n".join(f"""      <a class="door" href="{PREFIX[lang]}{slug}/">
+    doors = "\n".join(f"""      <a class="door" href="{PREFIX[lang]}{slug}">
         <span class="door-title">{title}</span>
         <span class="door-text">{text}</span>
         <span class="door-arrow" aria-hidden="true">&rarr;</span>
@@ -237,17 +243,6 @@ def landing(lang):
   </main>
 
 {footer(lang)}"""
-
-
-def about(lang):
-    t = HOME[lang]
-    p = parts(lang)
-    body = "\n\n".join([
-        section("now", t["toc"][0], p["now"]),
-        section("research", t["toc"][1], p["research"]),
-        section("outside", t["toc"][3], p["outside"]),
-    ])
-    return subpage(lang, "about/", ABOUT[lang], t["desc"], t["lede"], body)
 
 
 def node(lang, key):
@@ -510,6 +505,10 @@ def long_home(lang):
 # Follows the order and wording of Lebenslauf_van_de_Kreeke.docx. Personal
 # contact details (address, phone, email, date of birth) are left out on purpose.
 
+PAPER = ("<strong>Neuroendocrinological and Neurochemical Changes upon Administration of Combinations of DMT and Harmine</strong>",
+         "Dornbierer J.†, Aicher H.D.†, <strong>van de Kreeke L.J.</strong>, Smallridge J., Egger K., von Rotz R., Meling D., "
+         "Schlomberg J., Jareño J., Müller J., Seifritz E., Scheidegger M., Quednow B.B., Dornbierer D.A.<br>{shared}")
+
 CV = {
     "de": dict(
         title="Lebenslauf", desc="Lebenslauf von Lennert van de Kreeke.",
@@ -556,6 +555,9 @@ CV = {
                  "Psilocybin bei therapieresistenter Depression, Transkription und Auswertung von Visitenaufzeichnungen"),
                 ("03/2023 – 12/2023", "<strong>Klinische Studien</strong> · Research Assistant, Charité und Universität Zürich",
                  "EPIsoDE: Psilocybin bei therapieresistenter Depression, Charité<br>PRISM: Neurofeedback bei posttraumatischer Belastungsstörung, Charité<br>5-MeO-DMT: Embodiment und Schmerzwahrnehmung, Zürich<br>Studiendurchführung und Datenerhebung in Voll- und Teilzeit"),
+            ]),
+            ("Publikationen", [
+                ("in Vorbereitung", PAPER[0], PAPER[1].replace("{shared}", "† geteilte Erstautorschaft")),
             ]),
             ("Fortbildungen und Kongresse", [
                 ("09/2025", "<strong>Autumn School Psychopharmakologie</strong> · DGPPN", "Leitung: Prof. Dr. med. Gerhard Gründer"),
@@ -621,6 +623,9 @@ CV = {
                 ("03/2023 – 12/2023", "<strong>Clinical studies</strong> · Research assistant, Charité and University of Zurich",
                  "EPIsoDE: psilocybin for treatment-resistant depression, Charité<br>PRISM: neurofeedback for post-traumatic stress disorder, Charité<br>5-MeO-DMT: embodiment and pain perception, Zurich<br>Running studies and collecting data, full- and part-time"),
             ]),
+            ("Publications", [
+                ("in preparation", PAPER[0], PAPER[1].replace("{shared}", "† shared first authorship")),
+            ]),
             ("Courses and conferences", [
                 ("09/2025", "<strong>Autumn School in Psychopharmacology</strong> · DGPPN", "Led by Prof. Dr. med. Gerhard Gründer"),
                 ("07/2025", "<strong>Summer School on Psychedelic Research</strong> · University of Groningen", None),
@@ -685,6 +690,9 @@ CV = {
                 ("03/2023 – 12/2023", "<strong>Klinische studies</strong> · Onderzoeksassistent, Charité en Universiteit Zürich",
                  "EPIsoDE: psilocybine bij therapieresistente depressie, Charité<br>PRISM: neurofeedback bij posttraumatische stressstoornis, Charité<br>5-MeO-DMT: embodiment en pijnwaarneming, Zürich<br>Uitvoering van studies en dataverzameling, voltijd en deeltijd"),
             ]),
+            ("Publicaties", [
+                ("in voorbereiding", PAPER[0], PAPER[1].replace("{shared}", "† gedeeld eerste auteurschap")),
+            ]),
             ("Cursussen en congressen", [
                 ("09/2025", "<strong>Autumn School Psychofarmacologie</strong> · DGPPN", "Onder leiding van Prof. Dr. med. Gerhard Gründer"),
                 ("07/2025", "<strong>Summer School on Psychedelic Research</strong> · Rijksuniversiteit Groningen", None),
@@ -705,6 +713,9 @@ CV = {
     ),
 }
 
+CV_IDS = ["pj", "education", "placements", "organizing", "research", "publications",
+          "courses", "work", "languages", "interests"]
+
 CV_LINKS = dict(psng=a("https://psng.info", "psng.info"), bpsa=a("https://bpsa.psng.info", "bpsa.psng.info"),
                 alps=a("https://alps.foundation", "alps.foundation"))
 
@@ -722,7 +733,7 @@ def cv(lang):
             <p>{main}</p>{x}
           </div>
         </article>""")
-        parts.append(section(label.lower().split(" ")[0].replace("ä", "ae"), label, "\n".join(entries)))
+        parts.append(section(CV_IDS[len(parts)], label, "\n".join(entries)))
     return f"""{head(lang, f"{t['title']} · Lennert van de Kreeke", t["desc"], "cv/")}
 <body class="cv-page">
   <main>
@@ -833,7 +844,7 @@ NOTFOUND = f"""<!doctype html>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="{asset('styles.css')}">
   <script>try{{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}}catch(e){{}}</script>
 </head>
 <body>
@@ -867,7 +878,6 @@ def write(path, html):
 for lang in LANGS:
     p = "" if lang == "en" else f"{lang}/"
     write(f"{p}index.html", landing(lang))
-    write(f"{p}about/index.html", about(lang))
     write(f"{p}organizing/index.html", organizing(lang))
     write(f"{p}contact/index.html", contact(lang))
     # The original long homepage, kept unlinked for reference.
