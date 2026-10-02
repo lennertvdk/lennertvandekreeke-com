@@ -54,9 +54,9 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--serif);
-  font-size: 1.1875rem;
-  line-height: 1.55;
+  font-family: var(--sans);
+  font-size: 1.0625rem;
+  line-height: 1.6;
   font-optical-sizing: auto;
   text-rendering: optimizeLegibility;
 }
@@ -186,7 +186,17 @@ p {
 }
 
 .hero-text > * {
-  max-width: 38rem;
+  max-width: 34rem;
+}
+
+@media (min-width: 900px) {
+  .hero-text > * {
+    max-width: min(34rem, 38vw);
+  }
+
+  .hero .lede {
+    font-size: 1.125rem;
+  }
 }
 
 .hero-bar {
@@ -210,7 +220,8 @@ p {
 
 .hero h1 {
   color: #fff;
-  font-size: clamp(2.75rem, 8vw, 5rem);
+  font-size: clamp(2.5rem, min(6vw, 8.5vh), 4.25rem);
+  margin-bottom: 0.9rem;
 }
 
 .hero .lede {
@@ -240,6 +251,7 @@ main > section:first-child {
 }
 
 h1 {
+  font-family: var(--serif);
   font-weight: 400;
   font-size: clamp(2.5rem, 7vw, 3.75rem);
   line-height: 1.05;
@@ -248,8 +260,8 @@ h1 {
 }
 
 .lede {
-  font-size: 1.4rem;
-  line-height: 1.4;
+  font-size: 1.25rem;
+  line-height: 1.5;
   max-width: 34rem;
 }
 
@@ -292,8 +304,9 @@ h2 {
 }
 
 h3 {
+  font-family: var(--serif);
   font-weight: 500;
-  font-size: 1.1875rem;
+  font-size: 1.25rem;
   line-height: 1.35;
   margin: 0 0 0.25rem;
 }
@@ -399,8 +412,6 @@ ul.links {
   background: var(--card);
   color: var(--ink);
   font: inherit;
-  font-family: var(--serif);
-  font-size: 1.0625rem;
 }
 
 .contact-form textarea {

@@ -6,6 +6,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 LANGS = ["en", "de", "nl"]
 PREFIX = {"en": "/", "de": "/de/", "nl": "/nl/"}
 FORMSPREE = "https://formspree.io/f/mjykqqog"
+YOUTUBE = "https://www.youtube.com/channel/UCMHHH4dOREJTJF_ySpgV7mA"
 PDF = "/cv/Lebenslauf_Lennert_van_de_Kreeke.pdf"
 
 UI = {
@@ -36,7 +37,7 @@ def head(lang, title, desc, page, noindex=False):
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
   <script>try{{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}}catch(e){{}}</script>
 </head>"""
@@ -226,7 +227,7 @@ HOME = {
 }
 
 
-def home(lang):
+def home(lang, page="", noindex=False):
     t = HOME[lang]
     ids = ["now", "research", "organizing", "outside", "cv", "contact"]
     toc = "\n".join(
@@ -240,8 +241,8 @@ def home(lang):
     organizing = "\n".join([
         entry(f"{s} 2025", t["psng"].format(ig=ig("psng.info")), a("https://psng.info", "Psychedelic Student Network Germany")),
         entry(f"{s} 2026", t["bpsa"].format(ig=ig("bpsa.berlin")), a("https://bpsa.psng.info", "Berlin Psychedelic Science Association")),
-        entry(t["ongoing"], t["lectures"].format(yt=a("https://www.youtube.com/channel/UCMHHH4dOREJTJF_ySpgV7mA", "YouTube")), t["lectures_t"]),
-        entry(t["aug"], t["abend"], "Ein Abend rund um Psychedelika"),
+        entry(t["ongoing"], t["lectures"].format(yt=a(YOUTUBE, "YouTube")), a(YOUTUBE, t["lectures_t"])),
+        entry(t["aug"], t["abend"], a("https://luma.com/n6io5052", "Ein Abend rund um Psychedelika")),
         entry(f"{s} 2024", t["alps"], a("https://alps.foundation", "ALPS Summer School")),
         entry("2023–2025", t["proz"], a("https://psychedelicresearchzurich.ch", "Psychedelic Research Organization of Zurich")),
         entry("2022–2025", t["psychag"], a("https://fsi-charite.de/ag/psych-ag/", t["psychag_t"])),
@@ -265,7 +266,7 @@ def home(lang):
           <button class="button" type="submit">{t["f_send"]}</button>
           <p class="form-status" role="status" aria-live="polite"></p>
         </form>
-        <p class="elsewhere">{t["elsewhere"]} {a("https://orcid.org/0009-0000-3939-5247", "ORCID")}</p>"""
+        <p class="elsewhere">{t["elsewhere"]} {a("https://www.instagram.com/l_vd_k/", "Instagram")} &middot; {a("https://www.linkedin.com/in/lennert-van-de-kreeke/", "LinkedIn")} &middot; {a("https://orcid.org/0009-0000-3939-5247", "ORCID")}</p>"""
 
     body = "\n\n".join([
         section("now", t["toc"][0], f'        <p class="meta">{t["month"]}</p>\n        <ul class="plain">\n{now}\n        </ul>'),
@@ -275,12 +276,12 @@ def home(lang):
         section("cv", t["toc"][4], cv),
         section("contact", t["toc"][5], contact),
     ])
-    return f"""{head(lang, "Lennert van de Kreeke", t["desc"], "")}
+    return f"""{head(lang, "Lennert van de Kreeke", t["desc"], page, noindex)}
 <body>
   <header class="hero">
     <img class="hero-img" src="/img/hero.jpg" srcset="/img/hero-1200.jpg 1200w, /img/hero.jpg 2400w" sizes="100vw" alt="{t["alt"]}" width="2400" height="1600">
     <div class="hero-bar">
-      {lang_switch(lang, "")}
+      {lang_switch(lang, page)}
       {toggle(lang)}
     </div>
     <div class="hero-text">
@@ -627,7 +628,7 @@ NOTFOUND = f"""<!doctype html>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
   <script>try{{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}}catch(e){{}}</script>
 </head>
@@ -662,6 +663,8 @@ def write(path, html):
 for lang in LANGS:
     p = "" if lang == "en" else f"{lang}/"
     write(f"{p}index.html", home(lang))
+    # The original long homepage, kept unlinked for reference.
+    write(f"{p}landingpage/index.html", home(lang, "landingpage/", noindex=True))
     write(f"{p}cv/index.html", cv(lang))
     write(f"{p}websites/index.html", websites(lang))
 write("404.html", NOTFOUND)
