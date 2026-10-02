@@ -62,9 +62,7 @@ def head(lang, title, desc, page, noindex=False, translated=True):
   <meta name="description" content="{desc}">{robots}{og}
 {alts}
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+  <link rel="preload" href="/fonts/ibm-plex-sans-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{asset('styles.css')}">
   <script>try{{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}}catch(e){{}}</script>
 </head>"""
@@ -104,7 +102,7 @@ def footer(lang, scripts=("theme.js",)):
     <nav class="footer-nav" aria-label="{UI[lang]["sections"]}">
 {site_nav(lang, "      ")}
     </nav>
-    <p>Berlin &middot; {UI[lang]["updated"]}</p>
+    <p>Berlin &middot; {UI[lang]["updated"]} &middot; <a href="{PREFIX[lang]}privacy/">{PRIVACY[lang]["title"]}</a></p>
   </footer>
 {tags}
 </body>
@@ -852,6 +850,98 @@ def websites(lang):
 {footer(lang)}"""
 
 
+# ---------------------------------------------------------------- Privacy policy
+# Describes exactly what this site does. Update it if anything is added that
+# processes visitor data (analytics, embeds, another form service, ...).
+
+EMAIL = "lennert@lennertvandekreeke.com"
+
+PRIVACY = {
+    "de": dict(title="Datenschutz", lede="Was mit deinen Daten passiert, wenn du diese Website besuchst.", stand="Stand: Oktober 2026", sections=[
+        ("Verantwortlich", [
+            "Lennert van de Kreeke, Berlin. Erreichbar per E-Mail an {email} oder über das {form}."]),
+        ("Kurz gesagt", [
+            "Diese Website setzt keine Cookies, nutzt keine Analyse- oder Tracking-Dienste und bindet keine Inhalte von Drittanbietern ein. Schriftarten und Bilder kommen von diesem Server. Daten fallen nur beim Hosting und, wenn du es nutzt, beim Kontaktformular an."]),
+        ("Hosting", [
+            "Die Website wird über GitHub Pages bereitgestellt (GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA). Beim Aufruf verarbeitet GitHub technisch notwendige Daten wie deine IP-Adresse, Datum und Uhrzeit, die aufgerufene Seite und deinen Browser, um die Seite auszuliefern und die Sicherheit des Dienstes zu gewährleisten.",
+            "Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO; mein berechtigtes Interesse ist eine sichere und funktionierende Website. Die Übermittlung in die USA stützt sich auf das EU-US Data Privacy Framework. Mehr dazu in der {github}."]),
+        ("Kontaktformular", [
+            "Wenn du das Formular nutzt, werden dein Name, deine E-Mail-Adresse und deine Nachricht über den Dienst Formspree (Formspree, Inc., USA) an mich weitergeleitet. Dabei verarbeitet Formspree auch technische Daten wie deine IP-Adresse, um Spam zu erkennen.",
+            "Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO, wenn es um eine Anfrage zu einer möglichen Zusammenarbeit geht, sonst Art. 6 Abs. 1 lit. f DSGVO (mein Interesse, Nachrichten zu beantworten). Die Daten werden in den USA verarbeitet; Formspree nutzt dafür die EU-Standardvertragsklauseln. Ich lösche Nachrichten, wenn sie erledigt sind und keine Aufbewahrungspflicht besteht. Mehr dazu in der {formspree}."]),
+        ("Lokale Speicherung", [
+            "Wenn du zwischen hellem und dunklem Design wechselst, merkt sich dein Browser diese Wahl im lokalen Speicher (localStorage). Diese Einstellung bleibt auf deinem Gerät und wird nicht übertragen."]),
+        ("Links", [
+            "Links zu anderen Seiten, etwa Instagram, LinkedIn oder YouTube, werden erst geöffnet, wenn du sie anklickst. Ab dann gelten die Datenschutzbestimmungen der jeweiligen Anbieter."]),
+        ("Deine Rechte", [
+            "Du hast das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung deiner Daten, auf Datenübertragbarkeit sowie auf Widerspruch gegen eine Verarbeitung nach Art. 6 Abs. 1 lit. f DSGVO. Schreib mir dafür einfach.",
+            "Außerdem kannst du dich bei einer Datenschutz-Aufsichtsbehörde beschweren, zum Beispiel bei der {authority}."]),
+    ]),
+    "en": dict(title="Privacy", lede="What happens to your data when you visit this site.", stand="Last updated: October 2026", sections=[
+        ("Who is responsible", [
+            "Lennert van de Kreeke, Berlin. You can reach me by email at {email} or through the {form}."]),
+        ("In short", [
+            "This site sets no cookies, uses no analytics or tracking, and embeds nothing from third parties. Fonts and images come from this server. Data is only processed for hosting and, if you use it, the contact form."]),
+        ("Hosting", [
+            "The site is served by GitHub Pages (GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA). When you visit, GitHub processes technically necessary data such as your IP address, the date and time, the page requested and your browser, to deliver the page and keep the service secure.",
+            "The legal basis is Art. 6(1)(f) GDPR; my legitimate interest is a secure, working website. Transfers to the US rely on the EU-US Data Privacy Framework. See the {github}."]),
+        ("Contact form", [
+            "If you use the form, your name, email address and message are passed on to me through Formspree (Formspree, Inc., USA). Formspree also processes technical data such as your IP address to filter spam.",
+            "The legal basis is Art. 6(1)(b) GDPR where your message is about possibly working together, otherwise Art. 6(1)(f) GDPR (my interest in answering messages). The data is processed in the US; Formspree uses the EU standard contractual clauses for this. I delete messages once they are dealt with and nothing requires me to keep them. See the {formspree}."]),
+        ("Stored on your device", [
+            "If you switch between the light and dark theme, your browser remembers that choice in its local storage (localStorage). It stays on your device and is never sent anywhere."]),
+        ("Links", [
+            "Links to other sites, such as Instagram, LinkedIn or YouTube, only open when you click them. From then on, that provider’s privacy policy applies."]),
+        ("Your rights", [
+            "You have the right to access, correct and delete your data, to restrict its processing, to data portability, and to object to processing based on Art. 6(1)(f) GDPR. Just write to me.",
+            "You can also complain to a data protection authority, for example the {authority}."]),
+    ]),
+    "nl": dict(title="Privacy", lede="Wat er met je gegevens gebeurt als je deze website bezoekt.", stand="Laatst bijgewerkt: oktober 2026", sections=[
+        ("Verantwoordelijk", [
+            "Lennert van de Kreeke, Berlijn. Je bereikt me per e-mail via {email} of via het {form}."]),
+        ("Kort gezegd", [
+            "Deze website plaatst geen cookies, gebruikt geen analyse- of trackingdiensten en laadt geen inhoud van derden. Lettertypen en afbeeldingen komen van deze server. Er worden alleen gegevens verwerkt voor de hosting en, als je het gebruikt, het contactformulier."]),
+        ("Hosting", [
+            "De website wordt gehost via GitHub Pages (GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, VS). Bij een bezoek verwerkt GitHub technisch noodzakelijke gegevens zoals je IP-adres, datum en tijd, de opgevraagde pagina en je browser, om de pagina te leveren en de dienst veilig te houden.",
+            "De rechtsgrond is art. 6 lid 1 sub f AVG; mijn gerechtvaardigd belang is een veilige, werkende website. De doorgifte naar de VS is gebaseerd op het EU-VS Data Privacy Framework. Zie de {github}."]),
+        ("Contactformulier", [
+            "Als je het formulier gebruikt, worden je naam, e-mailadres en bericht via Formspree (Formspree, Inc., VS) naar mij doorgestuurd. Formspree verwerkt daarbij ook technische gegevens zoals je IP-adres om spam te herkennen.",
+            "De rechtsgrond is art. 6 lid 1 sub b AVG als het om een mogelijke samenwerking gaat, anders art. 6 lid 1 sub f AVG (mijn belang om berichten te beantwoorden). De gegevens worden in de VS verwerkt; Formspree gebruikt daarvoor de EU-modelcontractbepalingen. Ik verwijder berichten zodra ze zijn afgehandeld en er geen bewaarplicht geldt. Zie de {formspree}."]),
+        ("Opgeslagen op je apparaat", [
+            "Als je wisselt tussen het lichte en donkere thema, onthoudt je browser die keuze in de lokale opslag (localStorage). Die blijft op je apparaat en wordt nergens naartoe gestuurd."]),
+        ("Links", [
+            "Links naar andere sites, zoals Instagram, LinkedIn of YouTube, worden pas geopend als je erop klikt. Vanaf dat moment geldt het privacybeleid van die aanbieder."]),
+        ("Je rechten", [
+            "Je hebt recht op inzage, rectificatie, verwijdering en beperking van de verwerking van je gegevens, op overdraagbaarheid en op bezwaar tegen verwerking op grond van art. 6 lid 1 sub f AVG. Stuur me gewoon een bericht.",
+            "Je kunt ook een klacht indienen bij een toezichthouder, bijvoorbeeld de {authority}."]),
+    ]),
+}
+
+PRIVACY_LINKS = {
+    "de": dict(form="Kontaktformular", github="Datenschutzerklärung von GitHub", formspree="Datenschutzerklärung von Formspree",
+               authority="Berliner Beauftragten für Datenschutz und Informationsfreiheit"),
+    "en": dict(form="contact form", github="GitHub privacy statement", formspree="Formspree privacy policy",
+               authority="Berlin Commissioner for Data Protection and Freedom of Information"),
+    "nl": dict(form="contactformulier", github="privacyverklaring van GitHub", formspree="privacyverklaring van Formspree",
+               authority="Berlijnse toezichthouder voor gegevensbescherming (Berliner Beauftragte für Datenschutz und Informationsfreiheit)"),
+}
+
+
+def privacy(lang):
+    t, l = PRIVACY[lang], PRIVACY_LINKS[lang]
+    fill = dict(
+        email=a(f"mailto:{EMAIL}", EMAIL),
+        form=a(f"{PREFIX[lang]}contact/", l["form"]),
+        github=a("https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement", l["github"]),
+        formspree=a("https://formspree.io/legal/privacy-policy/", l["formspree"]),
+        authority=a("https://www.datenschutz-berlin.de", l["authority"]),
+    )
+    body = "\n\n".join(
+        section(f"p{i}", heading, "\n".join(f"        <p>{x.format(**fill)}</p>" for x in paras))
+        for i, (heading, paras) in enumerate(t["sections"]))
+    body += f'\n\n    <p class="meta legal-date">{t["stand"]}</p>'
+    return subpage(lang, "privacy/", t["title"], t["lede"], t["lede"], body)
+
+
 # ---------------------------------------------------------------- Lab (unlinked experiment, English only)
 
 def lab():
@@ -886,9 +976,7 @@ NOTFOUND = f"""<!doctype html>
   <title>Page not found · Lennert van de Kreeke</title>
   <meta name="robots" content="noindex">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+  <link rel="preload" href="/fonts/ibm-plex-sans-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{asset('styles.css')}">
   <script>try{{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}}catch(e){{}}</script>
 </head>
@@ -925,6 +1013,7 @@ for lang in LANGS:
     write(f"{p}index.html", landing(lang))
     write(f"{p}organizing/index.html", organizing(lang))
     write(f"{p}contact/index.html", contact(lang))
+    write(f"{p}privacy/index.html", privacy(lang))
     # The original long homepage, kept unlinked for reference.
     write(f"{p}landingpage/index.html", long_home(lang))
     write(f"{p}cv/index.html", cv(lang))
