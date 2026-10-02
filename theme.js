@@ -1,6 +1,7 @@
 // Light/dark toggle. Follows the system setting until the button is pressed,
 // then remembers the choice. The stored theme is applied by a small inline
-// script in <head> so the page doesn't flash on load.
+// script in <head> so the page doesn't flash on load. The button's labels
+// come from data attributes so each language can set its own.
 (function () {
   var root = document.documentElement;
   var button = document.querySelector(".theme-toggle");
@@ -14,7 +15,7 @@
   function updateLabel() {
     button.setAttribute(
       "aria-label",
-      current() === "dark" ? "Switch to light theme" : "Switch to dark theme"
+      current() === "dark" ? button.dataset.toLight : button.dataset.toDark
     );
   }
 

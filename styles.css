@@ -4,8 +4,6 @@
   --muted: #6d6a63;
   --rule: #d9d5cc;
   --accent: #9b2f1d;
-  --fill-bg: #fdeb8f;
-  --fill-ink: #4a3f00;
 
   --card: #fbfaf7;
   --shadow: rgba(40, 32, 20, 0.16);
@@ -24,8 +22,6 @@
     --muted: #9a968d;
     --rule: #33322e;
     --accent: #e0846c;
-    --fill-bg: #5a4d0c;
-    --fill-ink: #fff2b0;
     --card: #1e1e1b;
     --shadow: rgba(0, 0, 0, 0.5);
     color-scheme: dark;
@@ -38,8 +34,6 @@
   --muted: #9a968d;
   --rule: #33322e;
   --accent: #e0846c;
-  --fill-bg: #5a4d0c;
-  --fill-ink: #fff2b0;
   --card: #1e1e1b;
   --shadow: rgba(0, 0, 0, 0.5);
   color-scheme: dark;
@@ -100,16 +94,16 @@ p {
 }
 
 .topbar .back {
-  color: var(--muted);
+  color: var(--accent);
   text-decoration: none;
 }
 
 .topbar .back:hover {
-  color: var(--ink);
+  text-decoration: underline;
 }
 
 .theme-toggle {
-  margin-left: auto;
+  margin-left: 0.5rem;
   width: 2.25rem;
   height: 2.25rem;
   display: grid;
@@ -147,28 +141,95 @@ p {
   }
 }
 
-/* Intro */
+/* Full-screen hero */
 
-.intro {
-  display: grid;
-  grid-template-columns: 1fr 15rem;
-  gap: 3rem;
-  align-items: start;
-  padding: 3.5rem 0 3.5rem;
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
+  height: 100svh;
+  min-height: 34rem;
+  overflow: hidden;
+  background: #1c1b19;
+  color: #f5f3ee;
 }
 
-.intro-text {
-  grid-row: 1;
-}
-
-.portrait {
-  grid-column: 2;
-  grid-row: 1;
-  display: block;
+.hero-img {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: auto;
-  border-radius: 6px;
+  height: 100%;
+  object-fit: cover;
+  object-position: 45% 35%;
 }
+
+/* Darkens the bottom (and a little of the top) so the text stays readable. */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, rgba(12, 11, 10, 0.82) 0%, rgba(12, 11, 10, 0.4) 35%, rgba(12, 11, 10, 0) 60%),
+    linear-gradient(to bottom, rgba(12, 11, 10, 0.3) 0%, rgba(12, 11, 10, 0) 15%);
+}
+
+.hero-bar,
+.hero-text {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 82rem;
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 4vw, 3rem);
+}
+
+.hero-text > * {
+  max-width: 38rem;
+}
+
+.hero-bar {
+  display: flex;
+  align-items: center;
+  padding-top: 1.25rem;
+}
+
+.hero .theme-toggle {
+  color: rgba(245, 243, 238, 0.85);
+}
+
+.hero .theme-toggle:hover {
+  color: #fff;
+}
+
+.hero-text {
+  padding-bottom: 3.5rem;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.35);
+}
+
+.hero h1 {
+  color: #fff;
+  font-size: clamp(2.75rem, 8vw, 5rem);
+}
+
+.hero .lede {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.hero .toc {
+  margin-top: 1.75rem;
+}
+
+.hero .toc a {
+  color: #f0a58f;
+}
+
+main > section:first-child {
+  border-top: 0;
+}
+
+/* Headings and intro text */
 
 .photo {
   display: block;
@@ -192,10 +253,6 @@ h1 {
   max-width: 34rem;
 }
 
-.intro > p:not(.lede) {
-  max-width: 36rem;
-}
-
 .toc {
   display: flex;
   flex-wrap: wrap;
@@ -206,17 +263,17 @@ h1 {
 }
 
 .toc a {
-  color: var(--muted);
+  color: var(--accent);
   text-decoration: none;
 }
 
 .toc a:hover {
-  color: var(--ink);
+  text-decoration: underline;
 }
 
 /* Sections */
 
-section:not(.intro) {
+main section {
   display: grid;
   grid-template-columns: 9rem 1fr;
   gap: 1rem 2rem;
@@ -241,14 +298,8 @@ h3 {
   margin: 0 0 0.25rem;
 }
 
-h3 a {
-  color: inherit;
-  text-decoration-color: var(--rule);
-}
-
 h3 a:hover {
-  color: var(--accent);
-  text-decoration-color: currentColor;
+  text-decoration-thickness: 2px;
 }
 
 h3.group {
@@ -322,14 +373,150 @@ ul.links {
   font-size: 0.9375rem;
 }
 
-/* Placeholders still to be written. Delete this rule once they're all gone. */
-mark.fill {
-  background: var(--fill-bg);
-  color: var(--fill-ink);
-  padding: 0 0.2em;
-  border-radius: 2px;
+/* Contact form */
+
+.contact-form {
+  display: grid;
+  gap: 1rem;
+  max-width: 32rem;
+  margin-top: 1.25rem;
+}
+
+.contact-form label {
+  display: grid;
+  gap: 0.3rem;
   font-family: var(--sans);
-  font-size: 0.85em;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  font-family: var(--serif);
+  font-size: 1.0625rem;
+}
+
+.contact-form textarea {
+  resize: vertical;
+  min-height: 8rem;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+  border-color: transparent;
+}
+
+.contact-form .hp {
+  position: absolute;
+  left: -9999px;
+}
+
+.button {
+  justify-self: start;
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  border: 0;
+  border-radius: 4px;
+  background: var(--accent);
+  color: var(--paper);
+  font-family: var(--sans);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.button:hover {
+  filter: brightness(1.08);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.form-status {
+  font-family: var(--sans);
+  font-size: 0.9375rem;
+  margin: 0;
+}
+
+.form-status:empty {
+  display: none;
+}
+
+.elsewhere {
+  margin-top: 2rem;
+  font-family: var(--sans);
+  font-size: 0.9375rem;
+  color: var(--muted);
+}
+
+/* Language switch */
+
+.lang {
+  display: flex;
+  gap: 0.7rem;
+  margin-left: auto;
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+}
+
+.lang a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.lang a:hover {
+  text-decoration: underline;
+}
+
+.lang [aria-current] {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.hero .lang a {
+  color: #f0a58f;
+}
+
+.hero .lang [aria-current] {
+  color: #fff;
+}
+
+/* CV page: headings above the entries, like the PDF */
+
+.page-head .button {
+  margin-top: 0.5rem;
+}
+
+.cv-page main section {
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.cv-page .entry {
+  grid-template-columns: 9.5rem 1fr;
+}
+
+.cv-page .entry p {
+  margin-bottom: 0.2rem;
+}
+
+/* 404 */
+
+.notfound p {
+  margin-bottom: 0.4rem;
 }
 
 footer {
@@ -420,12 +607,11 @@ a.frame:hover {
 }
 
 .site h2 a {
-  color: inherit;
   text-decoration: none;
 }
 
 .site h2 a:hover {
-  color: var(--accent);
+  text-decoration: underline;
 }
 
 .site .stack {
@@ -461,22 +647,6 @@ a.frame:hover {
     font-size: 1.0625rem;
   }
 
-  .intro {
-    grid-template-columns: 1fr;
-    gap: 1.75rem;
-    padding: 1rem 0 2.5rem;
-  }
-
-  .portrait,
-  .intro-text {
-    grid-column: 1;
-    grid-row: auto;
-  }
-
-  .portrait {
-    width: 9rem;
-  }
-
   .photo {
     margin-bottom: 1.5rem;
   }
@@ -498,12 +668,13 @@ a.frame:hover {
     font-size: 1.25rem;
   }
 
-  section:not(.intro) {
+  main section {
     grid-template-columns: 1fr;
     gap: 0.75rem;
   }
 
-  .entry {
+  .entry,
+  .cv-page .entry {
     grid-template-columns: 1fr;
   }
 
