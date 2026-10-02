@@ -197,7 +197,7 @@ ORG = {
 
 GROUPS = dict(
     proz=("Psychedelic Research Organization of Zurich", "https://psychedelicresearchzurich.ch", "/img/logos/proz.svg"),
-    alps=("ALPS Foundation", "https://alps.foundation", "/img/logos/alps.svg"),
+    alps=("ALPS Foundation", "https://alps.foundation", "/img/logos/alps.png"),
     psng=("Psychedelic Student Network Germany", "https://psng.info", "/img/logos/psng.png"),
     bpsa=("Berlin Psychedelic Science Association", "https://bpsa.psng.info", "/img/logos/bpsa.png"),
 )
