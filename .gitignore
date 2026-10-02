@@ -1,0 +1,5 @@
+.DS_Store
+.claude/
+
+# Raw photos, not for publishing
+DSC_*
