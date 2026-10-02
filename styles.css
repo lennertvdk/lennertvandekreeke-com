@@ -150,7 +150,32 @@ p {
 /* Intro */
 
 .intro {
+  display: grid;
+  grid-template-columns: 1fr 15rem;
+  gap: 3rem;
+  align-items: start;
   padding: 3.5rem 0 3.5rem;
+}
+
+.intro-text {
+  grid-row: 1;
+}
+
+.portrait {
+  grid-column: 2;
+  grid-row: 1;
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+.photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin: 0.3rem 0 2rem;
 }
 
 h1 {
@@ -437,7 +462,23 @@ a.frame:hover {
   }
 
   .intro {
-    padding: 2rem 0 2.5rem;
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+    padding: 1rem 0 2.5rem;
+  }
+
+  .portrait,
+  .intro-text {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .portrait {
+    width: 9rem;
+  }
+
+  .photo {
+    margin-bottom: 1.5rem;
   }
 
   .page-head {
