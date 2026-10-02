@@ -1,7 +1,7 @@
 // A few hundred dots wired up like neurons. Nothing happens on its own: dots
 // only light up where the cursor (or a finger) passes. A lit dot glows in a
 // colour that depends on where it sits, so the field forms a slow rainbow, and
-// it passes a little light along its connections to its neighbours before
+// after a short delay its neighbours pick up a little of the glow before
 // everything fades back. A click or tap lights a whole patch in a ripple.
 (function () {
   var canvas = document.querySelector(".lab-canvas");
@@ -84,13 +84,6 @@
   }
 
   // Connections are drawn as gentle curves rather than straight lines.
-  function curvePoint(a, b, t) {
-    var mx = (a.x + b.x) / 2 - (b.y - a.y) * a.bend;
-    var my = (a.y + b.y) / 2 + (b.x - a.x) * a.bend;
-    var u = 1 - t;
-    return { x: u * u * a.x + 2 * u * t * mx + t * t * b.x, y: u * u * a.y + 2 * u * t * my + t * t * b.y };
-  }
-
   function strokeCurve(a, b) {
     var mx = (a.x + b.x) / 2 - (b.y - a.y) * a.bend;
     var my = (a.y + b.y) / 2 + (b.x - a.x) * a.bend;
@@ -187,19 +180,6 @@
         strokeCurve(n, m);
         ctx.stroke();
       });
-    });
-
-    // Light travelling to neighbours, as short soft streaks along the curve.
-    ctx.lineCap = "round";
-    ctx.lineWidth = 2;
-    signals.forEach(function (s) {
-      var p0 = curvePoint(s.a, s.b, Math.max(0, s.t - 24 / s.len));
-      var p1 = curvePoint(s.a, s.b, s.t);
-      ctx.strokeStyle = hsla(s.hue, 0.85 * (1 - s.t * 0.5));
-      ctx.beginPath();
-      ctx.moveTo(p0.x, p0.y);
-      ctx.lineTo(p1.x, p1.y);
-      ctx.stroke();
     });
 
     // Dots: grey at rest, coloured and a little larger when lit.
