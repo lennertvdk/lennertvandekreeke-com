@@ -67,9 +67,16 @@ def topbar(lang, page):
     </div>"""
 
 
+def site_nav(lang, indent="        "):
+    return "\n".join(f'{indent}<a href="{PREFIX[lang]}{slug}/">{label}</a>' for slug, label in NAV[lang])
+
+
 def footer(lang, scripts=("theme.js",)):
     tags = "\n".join(f'  <script src="/{s}"></script>' for s in scripts)
     return f"""  <footer>
+    <nav class="footer-nav" aria-label="{UI[lang]["sections"]}">
+{site_nav(lang, "      ")}
+    </nav>
     <p>Berlin &middot; {UI[lang]["updated"]}</p>
   </footer>
 {tags}
@@ -99,6 +106,191 @@ def section(id_, label, inner):
 
 def a(href, text):
     return f'<a href="{href}">{text}</a>'
+
+
+# ---------------------------------------------------------------- Site structure
+
+NAV = {
+    "en": [("about", "About"), ("organizing", "Organizing"), ("cv", "CV"), ("contact", "Contact")],
+    "de": [("about", "Über mich"), ("organizing", "Engagement"), ("cv", "Lebenslauf"), ("contact", "Kontakt")],
+    "nl": [("about", "Over mij"), ("organizing", "Organiseren"), ("cv", "CV"), ("contact", "Contact")],
+}
+
+# The four "doors" under the hero on the landing page.
+DOORS = {
+    "en": [("about", "Research", "My doctorate in Zurich, the EPIsoDE study, and what I do outside medicine."),
+           ("organizing", "Organizing", "How PROZ, ALPS, PSNG and BPSA fit together, plus lectures and events."),
+           ("cv", "CV", "The full CV, with a PDF to download."),
+           ("contact", "Contact", "A form, plus Instagram and LinkedIn.")],
+    "de": [("about", "Forschung", "Meine Promotion in Zürich, die EPIsoDE-Studie und was ich außerhalb der Medizin mache."),
+           ("organizing", "Engagement", "Wie PROZ, ALPS, PSNG und BPSA zusammenhängen, dazu Vorträge und Veranstaltungen."),
+           ("cv", "Lebenslauf", "Der ausführliche Lebenslauf, auch als PDF."),
+           ("contact", "Kontakt", "Ein Formular, dazu Instagram und LinkedIn.")],
+    "nl": [("about", "Onderzoek", "Mijn promotie in Zürich, de EPIsoDE-studie en wat ik buiten de geneeskunde doe."),
+           ("organizing", "Organiseren", "Hoe PROZ, ALPS, PSNG en BPSA met elkaar samenhangen, plus lezingen en evenementen."),
+           ("cv", "CV", "Het volledige cv, ook als pdf."),
+           ("contact", "Contact", "Een formulier, plus Instagram en LinkedIn.")],
+}
+
+ABOUT = {"en": "About", "de": "Über mich", "nl": "Over mij"}
+CONTACT = {"en": "Contact", "de": "Kontakt", "nl": "Contact"}
+
+ORG = {
+    "en": dict(
+        title="Organizing", lede="Four groups, one thread: each one shaped the next.",
+        map="How it fits together", story_t="How it came about", more="More",
+        led="led to", content="content", execution="execution", local="local group",
+        merge="PROZ content + ALPS execution",
+        nodes=dict(
+            proz=("Zurich · 2023–2025 · Co-organizer", "Student group at the University of Zurich and ETH. A lecture series for 50 to 100 people and a Swiss student conference."),
+            alps=("Switzerland · since 2024 · Co-organizer", "Awareness Lectures on Psychedelics in Switzerland. Participant coordination in 2025, the whole summer school in 2026."),
+            psng=("Germany · since 2025 · Co-founder", "Germany’s first nationwide student network for psychedelic science. Over 250 members in 13 cities."),
+            bpsa=("Berlin · since 2026 · Co-organizer", "PSNG’s Berlin group. Talks and community evenings."),
+        ),
+        story=[
+            "It started in Zurich. At PROZ, a student group at the university and ETH, we organized a lecture series for 50 to 100 people and a Swiss student conference.",
+            "That led to ALPS: broader, more serious and more professional. I coordinated the participants in 2025 and ran the whole summer school in 2026: team, programme, marketing and budget.",
+            "Germany didn’t have a network like that yet, so in 2025 I started PSNG with two other students. What I’m aiming for: ALPS-level execution and professionalism, with PROZ-level content at the core. In Berlin, that happens at BPSA, with talks and community evenings.",
+        ],
+    ),
+    "de": dict(
+        title="Engagement", lede="Vier Gruppen, ein roter Faden: Jede hat die nächste geprägt.",
+        map="Wie es zusammenhängt", story_t="Wie es dazu kam", more="Außerdem",
+        led="führte zu", content="Inhalte", execution="Umsetzung", local="Lokalgruppe",
+        merge="Inhalte wie bei PROZ + Umsetzung wie bei ALPS",
+        nodes=dict(
+            proz=("Zürich · 2023–2025 · Mitorganisator", "Studentische Gruppe an Universität und ETH Zürich. Eine Vortragsreihe für 50 bis 100 Leute und eine Schweizer Studierendenkonferenz."),
+            alps=("Schweiz · seit 2024 · Mitorganisator", "Awareness Lectures on Psychedelics in Switzerland. 2025 die Teilnehmendenkoordination, 2026 die ganze Summer School."),
+            psng=("Deutschland · seit 2025 · Mitgründer", "Das erste bundesweite studentische Netzwerk für psychedelische Wissenschaft. Über 250 Mitglieder in 13 Städten."),
+            bpsa=("Berlin · seit 2026 · Mitorganisator", "Die Berliner Gruppe des PSNG. Vorträge und Community-Abende."),
+        ),
+        story=[
+            "Angefangen hat es in Zürich. Bei PROZ, einer studentischen Gruppe an Uni und ETH, haben wir eine Vortragsreihe für 50 bis 100 Leute und eine Schweizer Studierendenkonferenz organisiert.",
+            "Daraus wurde ALPS: breiter, ernsthafter und professioneller. 2025 habe ich die Teilnehmenden koordiniert, 2026 die ganze Summer School geleitet: Team, Programm, Marketing und Budget.",
+            "In Deutschland gab es so ein Netzwerk noch nicht, also habe ich 2025 mit zwei anderen Studierenden das PSNG gegründet. Mein Anspruch: Umsetzung und Professionalität auf ALPS-Niveau, mit Inhalten auf PROZ-Niveau im Mittelpunkt. In Berlin passiert das bei der BPSA, mit Vorträgen und Community-Abenden.",
+        ],
+    ),
+    "nl": dict(
+        title="Organiseren", lede="Vier groepen, één rode draad: elke groep vormde de volgende.",
+        map="Hoe het samenhangt", story_t="Hoe het zo kwam", more="Verder",
+        led="leidde tot", content="inhoud", execution="uitvoering", local="lokale groep",
+        merge="Inhoud zoals bij PROZ + uitvoering zoals bij ALPS",
+        nodes=dict(
+            proz=("Zürich · 2023–2025 · mede-organisator", "Studentengroep aan de Universiteit Zürich en de ETH. Een lezingenreeks voor 50 tot 100 mensen en een Zwitserse studentenconferentie."),
+            alps=("Zwitserland · sinds 2024 · mede-organisator", "Awareness Lectures on Psychedelics in Switzerland. In 2025 de deelnemerscoördinatie, in 2026 de hele summer school."),
+            psng=("Duitsland · sinds 2025 · medeoprichter", "Het eerste landelijke studentennetwerk voor psychedelische wetenschap in Duitsland. Meer dan 250 leden in 13 steden."),
+            bpsa=("Berlijn · sinds 2026 · mede-organisator", "De Berlijnse groep van PSNG. Lezingen en community-avonden."),
+        ),
+        story=[
+            "Het begon in Zürich. Bij PROZ, een studentengroep aan de universiteit en de ETH, organiseerden we een lezingenreeks voor 50 tot 100 mensen en een Zwitserse studentenconferentie.",
+            "Dat leidde tot ALPS: breder, serieuzer en professioneler. In 2025 coördineerde ik de deelnemers, in 2026 leidde ik de hele summer school: team, programma, marketing en budget.",
+            "In Duitsland bestond zo’n netwerk nog niet, dus in 2025 richtte ik met twee andere studenten PSNG op. Waar ik naar streef: uitvoering en professionaliteit op het niveau van ALPS, met inhoud op het niveau van PROZ als kern. In Berlijn gebeurt dat bij BPSA, met lezingen en community-avonden.",
+        ],
+    ),
+}
+
+GROUPS = dict(
+    proz=("Psychedelic Research Organization of Zurich", "https://psychedelicresearchzurich.ch", "/img/logos/proz.svg"),
+    alps=("ALPS Foundation", "https://alps.foundation", "/img/logos/alps.svg"),
+    psng=("Psychedelic Student Network Germany", "https://psng.info", "/img/logos/psng.png"),
+    bpsa=("Berlin Psychedelic Science Association", "https://bpsa.psng.info", "/img/logos/bpsa.png"),
+)
+
+
+def subpage(lang, page, title, desc, lede, body, scripts=("theme.js",), body_class=""):
+    cls = f' class="{body_class}"' if body_class else ""
+    lede_html = f'\n      <p class="lede">{lede}</p>' if lede else ""
+    return f"""{head(lang, f"{title} · Lennert van de Kreeke", desc, page)}
+<body{cls}>
+  <main>
+
+{topbar(lang, page)}
+
+    <header class="page-head">
+      <h1>{title}</h1>{lede_html}
+    </header>
+
+{body}
+
+  </main>
+
+{footer(lang, scripts)}"""
+
+
+def landing(lang):
+    t = HOME[lang]
+    doors = "\n".join(f"""      <a class="door" href="{PREFIX[lang]}{slug}/">
+        <span class="door-title">{title}</span>
+        <span class="door-text">{text}</span>
+        <span class="door-arrow" aria-hidden="true">&rarr;</span>
+      </a>""" for slug, title, text in DOORS[lang])
+    return f"""{head(lang, "Lennert van de Kreeke", t["desc"], "")}
+<body>
+{hero(lang, "", site_nav(lang))}
+
+  <main>
+
+    <nav class="doors" aria-label="{UI[lang]["sections"]}">
+{doors}
+    </nav>
+
+  </main>
+
+{footer(lang)}"""
+
+
+def about(lang):
+    t = HOME[lang]
+    p = parts(lang)
+    body = "\n\n".join([
+        section("now", t["toc"][0], p["now"]),
+        section("research", t["toc"][1], p["research"]),
+        section("outside", t["toc"][3], p["outside"]),
+    ])
+    return subpage(lang, "about/", ABOUT[lang], t["desc"], t["lede"], body)
+
+
+def node(lang, key):
+    name, url, logo = GROUPS[key]
+    meta, text = ORG[lang]["nodes"][key]
+    return f"""        <article class="node node-{key}">
+          <a class="node-logo" href="{url}"><img src="{logo}" alt="{name}" loading="lazy"></a>
+          <h3>{a(url, name)}</h3>
+          <p class="node-meta">{meta}</p>
+          <p>{text}</p>
+        </article>"""
+
+
+def organizing(lang):
+    t = ORG[lang]
+    graph = f"""        <div class="graph">
+{node(lang, "proz")}
+          <p class="link link-led"><span>{t["led"]}</span></p>
+{node(lang, "alps")}
+          <div class="merge" aria-hidden="true">
+            <svg viewBox="0 0 600 60" preserveAspectRatio="none"><path d="M100 0 C100 40 300 20 300 60 M500 0 C500 40 300 20 300 60" /></svg>
+            <span class="merge-a">{t["content"]}</span>
+            <span class="merge-b">{t["execution"]}</span>
+          </div>
+          <p class="link link-merge"><span>{t["merge"]}</span></p>
+{node(lang, "psng")}
+          <p class="link link-local"><span>{t["local"]}</span></p>
+{node(lang, "bpsa")}
+        </div>"""
+    story = "\n".join(f"        <p>{x}</p>" for x in t["story"])
+    body = "\n\n".join([
+        section("map", t["map"], graph),
+        section("story", t["story_t"], story),
+        section("more", t["more"], parts(lang)["more_organizing"]),
+    ])
+    return subpage(lang, "organizing/", t["title"], t["lede"], t["lede"], body, body_class="org-page")
+
+
+def contact(lang):
+    t = HOME[lang]
+    form = parts(lang)["contact"].split("\n", 1)[1]  # without the intro line, which becomes the lede
+    body = f'    <section class="solo">\n      <div class="body">\n{form}\n      </div>\n    </section>'
+    return subpage(lang, "contact/", CONTACT[lang], t["contact_intro"], t["contact_intro"], body, scripts=("theme.js", "contact.js"))
 
 
 # ---------------------------------------------------------------- Home
@@ -227,35 +419,38 @@ HOME = {
 }
 
 
-def home(lang, page="", noindex=False):
+def parts(lang):
+    """HTML for each content block, shared by the pages that show them."""
     t = HOME[lang]
-    ids = ["now", "research", "organizing", "outside", "cv", "contact"]
-    toc = "\n".join(
-        f'        <a href="{PREFIX[lang]}cv/">{label}</a>' if i == "cv" else f'        <a href="#{i}">{label}</a>'
-        for i, label in zip(ids, t["toc"]))
     s = t["since"]
     ig = lambda h: a(f"https://www.instagram.com/{h}/", "@" + h)
-
     now = "\n".join(f"          <li>{x}</li>" for x in t["now"])
-    research = "\n".join(entry(f"{s} {y}" if y else "2023", body, title) for y, title, body in t["research"])
-    organizing = "\n".join([
-        entry(f"{s} 2025", t["psng"].format(ig=ig("psng.info")), a("https://psng.info", "Psychedelic Student Network Germany")),
-        entry(f"{s} 2026", t["bpsa"].format(ig=ig("bpsa.berlin")), a("https://bpsa.psng.info", "Berlin Psychedelic Science Association")),
-        entry(t["ongoing"], t["lectures"].format(yt=a(YOUTUBE, "YouTube")), a(YOUTUBE, t["lectures_t"])),
-        entry(t["aug"], t["abend"], a("https://luma.com/n6io5052", "Ein Abend rund um Psychedelika")),
-        entry(f"{s} 2024", t["alps"], a("https://alps.foundation", "ALPS Summer School")),
-        entry("2023–2025", t["proz"], a("https://psychedelicresearchzurich.ch", "Psychedelic Research Organization of Zurich")),
-        entry("2022–2025", t["psychag"], a("https://fsi-charite.de/ag/psych-ag/", t["psychag_t"])),
-    ])
-    outside = "\n".join([
-        f'        <img class="photo" src="/img/colonnade.jpg" alt="{t["photo_alt"]}" width="1400" height="933" loading="lazy">',
-        entry("2014–2022", t["bass"]),
-        entry("2022", t["musical"]),
-        entry("2026", t["kiezburn"]),
-        entry(t["also"], t["misc"]),
-    ])
-    cv = f'        <p>{t["cv_line"].format(link=a(PREFIX[lang] + "cv/", t["cv_link"]))}</p>'
-    contact = f"""        <p>{t["contact_intro"]}</p>
+    return dict(
+        now=f'        <p class="meta">{t["month"]}</p>\n        <ul class="plain">\n{now}\n        </ul>',
+        research="\n".join(entry(f"{s} {y}" if y else "2023", body, title) for y, title, body in t["research"]),
+        organizing="\n".join([
+            entry(f"{s} 2025", t["psng"].format(ig=ig("psng.info")), a("https://psng.info", "Psychedelic Student Network Germany")),
+            entry(f"{s} 2026", t["bpsa"].format(ig=ig("bpsa.berlin")), a("https://bpsa.psng.info", "Berlin Psychedelic Science Association")),
+            entry(t["ongoing"], t["lectures"].format(yt=a(YOUTUBE, "YouTube")), a(YOUTUBE, t["lectures_t"])),
+            entry(t["aug"], t["abend"], a("https://luma.com/n6io5052", "Ein Abend rund um Psychedelika")),
+            entry(f"{s} 2024", t["alps"], a("https://alps.foundation", "ALPS Summer School")),
+            entry("2023–2025", t["proz"], a("https://psychedelicresearchzurich.ch", "Psychedelic Research Organization of Zurich")),
+            entry("2022–2025", t["psychag"], a("https://fsi-charite.de/ag/psych-ag/", t["psychag_t"])),
+        ]),
+        more_organizing="\n".join([
+            entry(t["ongoing"], t["lectures"].format(yt=a(YOUTUBE, "YouTube")), a(YOUTUBE, t["lectures_t"])),
+            entry(t["aug"], t["abend"], a("https://luma.com/n6io5052", "Ein Abend rund um Psychedelika")),
+            entry("2022–2025", t["psychag"], a("https://fsi-charite.de/ag/psych-ag/", t["psychag_t"])),
+        ]),
+        outside="\n".join([
+            f'        <img class="photo" src="/img/colonnade.jpg" alt="{t["photo_alt"]}" width="1400" height="933" loading="lazy">',
+            entry("2014–2022", t["bass"]),
+            entry("2022", t["musical"]),
+            entry("2026", t["kiezburn"]),
+            entry(t["also"], t["misc"]),
+        ]),
+        cv=f'        <p>{t["cv_line"].format(link=a(PREFIX[lang] + "cv/", t["cv_link"]))}</p>',
+        contact=f"""        <p>{t["contact_intro"]}</p>
         <form class="contact-form" action="{FORMSPREE}" method="POST" data-sending="{t["f_sending"]}" data-success="{t["f_success"]}" data-error="{t["f_error"]}">
           <input type="hidden" name="_subject" value="{t["subject"]}">
           <input type="hidden" name="language" value="{lang}">
@@ -266,19 +461,13 @@ def home(lang, page="", noindex=False):
           <button class="button" type="submit">{t["f_send"]}</button>
           <p class="form-status" role="status" aria-live="polite"></p>
         </form>
-        <p class="elsewhere">{t["elsewhere"]} {a("https://www.instagram.com/l_vd_k/", "Instagram")} &middot; {a("https://www.linkedin.com/in/lennert-van-de-kreeke/", "LinkedIn")} &middot; {a("https://orcid.org/0009-0000-3939-5247", "ORCID")}</p>"""
+        <p class="elsewhere">{t["elsewhere"]} {a("https://www.instagram.com/l_vd_k/", "Instagram")} &middot; {a("https://www.linkedin.com/in/lennert-van-de-kreeke/", "LinkedIn")} &middot; {a("https://orcid.org/0009-0000-3939-5247", "ORCID")}</p>""",
+    )
 
-    body = "\n\n".join([
-        section("now", t["toc"][0], f'        <p class="meta">{t["month"]}</p>\n        <ul class="plain">\n{now}\n        </ul>'),
-        section("research", t["toc"][1], research),
-        section("organizing", t["toc"][2], organizing),
-        section("outside", t["toc"][3], outside),
-        section("cv", t["toc"][4], cv),
-        section("contact", t["toc"][5], contact),
-    ])
-    return f"""{head(lang, "Lennert van de Kreeke", t["desc"], page, noindex)}
-<body>
-  <header class="hero">
+
+def hero(lang, page, nav_html):
+    t = HOME[lang]
+    return f"""  <header class="hero">
     <img class="hero-img" src="/img/hero.jpg" srcset="/img/hero-1200.jpg 1200w, /img/hero.jpg 2400w" sizes="100vw" alt="{t["alt"]}" width="2400" height="1600">
     <div class="hero-bar">
       {lang_switch(lang, page)}
@@ -288,10 +477,25 @@ def home(lang, page="", noindex=False):
       <h1>Lennert van de Kreeke</h1>
       <p class="lede">{t["lede"]}</p>
       <nav class="toc" aria-label="{UI[lang]["sections"]}">
-{toc}
+{nav_html}
       </nav>
     </div>
-  </header>
+  </header>"""
+
+
+def long_home(lang):
+    """The original one-page homepage, kept unlinked at /landingpage."""
+    t = HOME[lang]
+    page = "landingpage/"
+    ids = ["now", "research", "organizing", "outside", "cv", "contact"]
+    toc = "\n".join(
+        f'        <a href="{PREFIX[lang]}cv/">{label}</a>' if i == "cv" else f'        <a href="#{i}">{label}</a>'
+        for i, label in zip(ids, t["toc"]))
+    p = parts(lang)
+    body = "\n\n".join(section(i, label, p[i]) for i, label in zip(ids, t["toc"]))
+    return f"""{head(lang, "Lennert van de Kreeke", t["desc"], page, noindex=True)}
+<body>
+{hero(lang, page, toc)}
 
   <main>
 
@@ -662,9 +866,12 @@ def write(path, html):
 
 for lang in LANGS:
     p = "" if lang == "en" else f"{lang}/"
-    write(f"{p}index.html", home(lang))
+    write(f"{p}index.html", landing(lang))
+    write(f"{p}about/index.html", about(lang))
+    write(f"{p}organizing/index.html", organizing(lang))
+    write(f"{p}contact/index.html", contact(lang))
     # The original long homepage, kept unlinked for reference.
-    write(f"{p}landingpage/index.html", home(lang, "landingpage/", noindex=True))
+    write(f"{p}landingpage/index.html", long_home(lang))
     write(f"{p}cv/index.html", cv(lang))
     write(f"{p}websites/index.html", websites(lang))
 write("404.html", NOTFOUND)
