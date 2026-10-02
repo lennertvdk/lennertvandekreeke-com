@@ -28,18 +28,39 @@ TOGGLE_SVG = ('<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="1
               'stroke="currentColor" stroke-width="1.5"/><path d="M10 2.5a7.5 7.5 0 0 1 0 15z" fill="currentColor"/></svg>')
 
 
-def head(lang, title, desc, page, noindex=False):
-    alts = "\n".join(f'  <link rel="alternate" hreflang="{l}" href="https://lennertvandekreeke.com{PREFIX[l]}{page}">' for l in LANGS)
+SITE = "https://lennertvandekreeke.com"
+LOCALE = {"en": "en_US", "de": "de_DE", "nl": "nl_NL"}
+
+
+def head(lang, title, desc, page, noindex=False, translated=True):
+    url = f"{SITE}{PREFIX[lang]}{page}"
+    alts = ""
+    if translated:
+        alts = "\n".join(f'  <link rel="alternate" hreflang="{l}" href="{SITE}{PREFIX[l]}{page}">' for l in LANGS)
+        alts += f'\n  <link rel="alternate" hreflang="x-default" href="{SITE}/{page}">'
     robots = '\n  <meta name="robots" content="noindex">' if noindex else ""
+    # Preview card for links shared on WhatsApp, LinkedIn, Signal and the like.
+    og = f"""
+  <link rel="canonical" href="{url}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Lennert van de Kreeke">
+  <meta property="og:title" content="{title}">
+  <meta property="og:description" content="{desc}">
+  <meta property="og:url" content="{url}">
+  <meta property="og:locale" content="{LOCALE[lang]}">
+  <meta property="og:image" content="{SITE}/img/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Lennert van de Kreeke">
+  <meta name="twitter:card" content="summary_large_image">"""
     return f"""<!doctype html>
 <html lang="{lang}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{title}</title>
-  <meta name="description" content="{desc}">{robots}
+  <meta name="description" content="{desc}">{robots}{og}
 {alts}
-  <link rel="alternate" hreflang="x-default" href="https://lennertvandekreeke.com/{page}">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -143,10 +164,10 @@ CONTACT = {"en": "Contact", "de": "Kontakt", "nl": "Contact"}
 
 ORG = {
     "en": dict(
-        title="Organizing", lede="Four groups, one thread: each one shaped the next.",
+        title="Organizing", lede="Four groups, one path. Each step shaped what I did next.",
         map="How it fits together", story_t="How it came about", more="More",
-        led="led to", content="content", execution="execution", local="local group",
-        merge="PROZ content + ALPS execution",
+        led="led me to", content="I took the content", execution="and the execution", local="and in Berlin",
+        merge="What I took along: the content from PROZ, the execution from ALPS",
         nodes=dict(
             proz=("Zurich · 2023–2025 · Co-organizer", "Student group at the University of Zurich and ETH. A lecture series for 50 to 100 people and a Swiss student conference."),
             alps=("Switzerland · since 2024 · Co-organizer", "Awareness Lectures on Psychedelics in Switzerland. Participant coordination in 2025, the whole summer school in 2026."),
@@ -154,16 +175,16 @@ ORG = {
             bpsa=("Berlin · since 2026 · Co-organizer", "PSNG’s Berlin group. Talks and community evenings."),
         ),
         story=[
-            "It started in Zurich. At PROZ, a student group at the university and ETH, we organized a lecture series for 50 to 100 people and a Swiss student conference.",
-            "That led to ALPS: broader, more serious and more professional. I coordinated the participants in 2025 and ran the whole summer school in 2026: team, programme, marketing and budget.",
-            "Germany didn’t have a network like that yet, so in 2025 I started PSNG with two other students. What I’m aiming for: ALPS-level execution and professionalism, with PROZ-level content at the core. In Berlin, that happens at BPSA, with talks and community evenings.",
+            "For me it started in Zurich. At PROZ, a student group at the university and ETH, I helped organize a lecture series for 50 to 100 people and a Swiss student conference.",
+            "Through PROZ I got into ALPS, where the work was broader, more serious and more professional. I coordinated the participants in 2025 and ran the whole summer school in 2026: team, programme, marketing and budget.",
+            "Back in Germany there was no network like that yet, so in 2025 I started PSNG with two other students. What I’m aiming for: ALPS-level execution and professionalism, with PROZ-level content at the core. In Berlin I do that with BPSA, through talks and community evenings.",
         ],
     ),
     "de": dict(
-        title="Engagement", lede="Vier Gruppen, ein roter Faden: Jede hat die nächste geprägt.",
+        title="Engagement", lede="Vier Gruppen, ein Weg. Jeder Schritt hat geprägt, was ich als Nächstes gemacht habe.",
         map="Wie es zusammenhängt", story_t="Wie es dazu kam", more="Außerdem",
-        led="führte zu", content="Inhalte", execution="Umsetzung", local="Lokalgruppe",
-        merge="Inhalte wie bei PROZ + Umsetzung wie bei ALPS",
+        led="brachte mich zu", content="Ich nahm die Inhalte mit", execution="und die Umsetzung", local="und in Berlin",
+        merge="Was ich mitgenommen habe: die Inhalte von PROZ, die Umsetzung von ALPS",
         nodes=dict(
             proz=("Zürich · 2023–2025 · Mitorganisator", "Studentische Gruppe an Universität und ETH Zürich. Eine Vortragsreihe für 50 bis 100 Leute und eine Schweizer Studierendenkonferenz."),
             alps=("Schweiz · seit 2024 · Mitorganisator", "Awareness Lectures on Psychedelics in Switzerland. 2025 die Teilnehmendenkoordination, 2026 die ganze Summer School."),
@@ -171,16 +192,16 @@ ORG = {
             bpsa=("Berlin · seit 2026 · Mitorganisator", "Die Berliner Gruppe des PSNG. Vorträge und Community-Abende."),
         ),
         story=[
-            "Angefangen hat es in Zürich. Bei PROZ, einer studentischen Gruppe an Uni und ETH, haben wir eine Vortragsreihe für 50 bis 100 Leute und eine Schweizer Studierendenkonferenz organisiert.",
-            "Daraus wurde ALPS: breiter, ernsthafter und professioneller. 2025 habe ich die Teilnehmenden koordiniert, 2026 die ganze Summer School geleitet: Team, Programm, Marketing und Budget.",
-            "In Deutschland gab es so ein Netzwerk noch nicht, also habe ich 2025 mit zwei anderen Studierenden das PSNG gegründet. Mein Anspruch: Umsetzung und Professionalität auf ALPS-Niveau, mit Inhalten auf PROZ-Niveau im Mittelpunkt. In Berlin passiert das bei der BPSA, mit Vorträgen und Community-Abenden.",
+            "Für mich hat es in Zürich angefangen. Bei PROZ, einer studentischen Gruppe an Uni und ETH, habe ich eine Vortragsreihe für 50 bis 100 Leute und eine Schweizer Studierendenkonferenz mitorganisiert.",
+            "Über PROZ bin ich zu ALPS gekommen, wo die Arbeit breiter, ernsthafter und professioneller war. 2025 habe ich die Teilnehmenden koordiniert, 2026 die ganze Summer School geleitet: Team, Programm, Marketing und Budget.",
+            "In Deutschland gab es so ein Netzwerk noch nicht, also habe ich 2025 mit zwei anderen Studierenden das PSNG gegründet. Mein Anspruch: Umsetzung und Professionalität auf ALPS-Niveau, mit Inhalten auf PROZ-Niveau im Mittelpunkt. In Berlin mache ich das mit der BPSA, mit Vorträgen und Community-Abenden.",
         ],
     ),
     "nl": dict(
-        title="Organiseren", lede="Vier groepen, één rode draad: elke groep vormde de volgende.",
+        title="Organiseren", lede="Vier groepen, één pad. Elke stap bepaalde wat ik daarna deed.",
         map="Hoe het samenhangt", story_t="Hoe het zo kwam", more="Verder",
-        led="leidde tot", content="inhoud", execution="uitvoering", local="lokale groep",
-        merge="Inhoud zoals bij PROZ + uitvoering zoals bij ALPS",
+        led="bracht me bij", content="Ik nam de inhoud mee", execution="en de uitvoering", local="en in Berlijn",
+        merge="Wat ik meenam: de inhoud van PROZ, de uitvoering van ALPS",
         nodes=dict(
             proz=("Zürich · 2023–2025 · mede-organisator", "Studentengroep aan de Universiteit Zürich en de ETH. Een lezingenreeks voor 50 tot 100 mensen en een Zwitserse studentenconferentie."),
             alps=("Zwitserland · sinds 2024 · mede-organisator", "Awareness Lectures on Psychedelics in Switzerland. In 2025 de deelnemerscoördinatie, in 2026 de hele summer school."),
@@ -188,9 +209,9 @@ ORG = {
             bpsa=("Berlijn · sinds 2026 · mede-organisator", "De Berlijnse groep van PSNG. Lezingen en community-avonden."),
         ),
         story=[
-            "Het begon in Zürich. Bij PROZ, een studentengroep aan de universiteit en de ETH, organiseerden we een lezingenreeks voor 50 tot 100 mensen en een Zwitserse studentenconferentie.",
-            "Dat leidde tot ALPS: breder, serieuzer en professioneler. In 2025 coördineerde ik de deelnemers, in 2026 leidde ik de hele summer school: team, programma, marketing en budget.",
-            "In Duitsland bestond zo’n netwerk nog niet, dus in 2025 richtte ik met twee andere studenten PSNG op. Waar ik naar streef: uitvoering en professionaliteit op het niveau van ALPS, met inhoud op het niveau van PROZ als kern. In Berlijn gebeurt dat bij BPSA, met lezingen en community-avonden.",
+            "Voor mij begon het in Zürich. Bij PROZ, een studentengroep aan de universiteit en de ETH, hielp ik een lezingenreeks voor 50 tot 100 mensen en een Zwitserse studentenconferentie organiseren.",
+            "Via PROZ kwam ik bij ALPS terecht, waar het werk breder, serieuzer en professioneler was. In 2025 coördineerde ik de deelnemers, in 2026 leidde ik de hele summer school: team, programma, marketing en budget.",
+            "In Duitsland bestond zo’n netwerk nog niet, dus in 2025 richtte ik met twee andere studenten PSNG op. Waar ik naar streef: uitvoering en professionaliteit op het niveau van ALPS, met inhoud op het niveau van PROZ als kern. In Berlijn doe ik dat met BPSA, met lezingen en community-avonden.",
         ],
     ),
 }
@@ -831,6 +852,30 @@ def websites(lang):
 {footer(lang)}"""
 
 
+# ---------------------------------------------------------------- Lab (unlinked experiment, English only)
+
+def lab():
+    return f"""{head("en", "Lab · Lennert van de Kreeke", "A small interactive toy: a few hundred dots wired up like neurons.", "lab/", noindex=True, translated=False)}
+<body class="lab-page">
+  <canvas class="lab-canvas" aria-label="Interactive network of dots that light up when you move over them"></canvas>
+  <div class="lab-ui">
+    <div class="topbar">
+      <a class="back" href="/">&larr; Lennert van de Kreeke</a>
+      {toggle("en")}
+    </div>
+    <div class="lab-note">
+      <h1>Lab</h1>
+      <p>A few hundred dots, wired up like neurons. Move over them to excite them, click or tap to make a cluster fire. Signals travel along the connections and sometimes set off the next ones.</p>
+      <p class="lab-meta"><span class="lab-count">0</span> spikes so far</p>
+    </div>
+  </div>
+  <script src="{asset("theme.js")}"></script>
+  <script src="{asset("lab.js")}"></script>
+</body>
+</html>
+"""
+
+
 # ---------------------------------------------------------------- 404 (one page, all three languages)
 
 NOTFOUND = f"""<!doctype html>
@@ -884,4 +929,16 @@ for lang in LANGS:
     write(f"{p}landingpage/index.html", long_home(lang))
     write(f"{p}cv/index.html", cv(lang))
     write(f"{p}websites/index.html", websites(lang))
+write("lab/index.html", lab())
+
+# Search engines: crawl everything, and here is the list of public pages.
+# Unlisted pages (/landingpage, /websites, /lab) carry a noindex tag instead.
+write("robots.txt", f"User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n")
+PUBLIC = ["", "organizing/", "cv/", "contact/"]
+urls = []
+for page in PUBLIC:
+    links = "".join(f'\n    <xhtml:link rel="alternate" hreflang="{l}" href="{SITE}{PREFIX[l]}{page}"/>' for l in LANGS)
+    for lang in LANGS:
+        urls.append(f"  <url>\n    <loc>{SITE}{PREFIX[lang]}{page}</loc>{links}\n  </url>")
+write("sitemap.xml", '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n' + "\n".join(urls) + "\n</urlset>\n")
 write("404.html", NOTFOUND)

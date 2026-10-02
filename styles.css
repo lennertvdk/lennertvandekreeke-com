@@ -82,6 +82,13 @@ p {
   margin: 0 0 0.75em;
 }
 
+/* Theme switch: the default cross-fade is replaced by the circle in theme.js. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
 /* Top bar */
 
 .topbar {
@@ -657,6 +664,11 @@ main section.solo {
   background: #fff;
 }
 
+/* The round PSNG logo has fine lettering, so it gets a taller tile. */
+.node-psng .node-logo {
+  height: 10rem;
+}
+
 .node-logo img {
   max-width: 100%;
   max-height: 100%;
@@ -736,8 +748,8 @@ main section.solo {
   color: var(--muted);
 }
 
-.merge-a { left: 20%; }
-.merge-b { right: 20%; }
+.merge-a { left: 12%; }
+.merge-b { right: 12%; }
 
 .link-merge {
   display: none;
@@ -794,6 +806,61 @@ main section.solo {
   .door-title {
     font-size: 1.5rem;
   }
+}
+
+/* Lab */
+
+.lab-page {
+  overflow: hidden;
+}
+
+.lab-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.lab-ui {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0 clamp(1.25rem, 4vw, 3rem) clamp(1.25rem, 4vw, 3rem);
+  pointer-events: none;
+}
+
+.lab-ui a,
+.lab-ui button {
+  pointer-events: auto;
+}
+
+.lab-note {
+  max-width: 24rem;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--paper) 82%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.lab-note h1 {
+  font-size: 1.75rem;
+  margin-bottom: 0.4rem;
+}
+
+.lab-note p {
+  font-size: 0.9375rem;
+}
+
+.lab-meta {
+  margin: 0;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }
 
 /* Websites page */

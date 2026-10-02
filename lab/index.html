@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lab · Lennert van de Kreeke</title>
+  <meta name="description" content="A small interactive toy: a few hundred dots wired up like neurons.">
+  <meta name="robots" content="noindex">
+  <link rel="canonical" href="https://lennertvandekreeke.com/lab/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Lennert van de Kreeke">
+  <meta property="og:title" content="Lab · Lennert van de Kreeke">
+  <meta property="og:description" content="A small interactive toy: a few hundred dots wired up like neurons.">
+  <meta property="og:url" content="https://lennertvandekreeke.com/lab/">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:image" content="https://lennertvandekreeke.com/img/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Lennert van de Kreeke">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css?v=14ba442c">
+  <script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body class="lab-page">
+  <canvas class="lab-canvas" aria-label="Interactive network of dots that light up when you move over them"></canvas>
+  <div class="lab-ui">
+    <div class="topbar">
+      <a class="back" href="/">&larr; Lennert van de Kreeke</a>
+      <button class="theme-toggle" type="button" data-to-dark="Switch to dark theme" data-to-light="Switch to light theme" aria-label="Switch to dark theme">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 2.5a7.5 7.5 0 0 1 0 15z" fill="currentColor"/></svg>
+      </button>
+    </div>
+    <div class="lab-note">
+      <h1>Lab</h1>
+      <p>A few hundred dots, wired up like neurons. Move over them to excite them, click or tap to make a cluster fire. Signals travel along the connections and sometimes set off the next ones.</p>
+      <p class="lab-meta"><span class="lab-count">0</span> spikes so far</p>
+    </div>
+  </div>
+  <script src="/theme.js?v=fd1c86a1"></script>
+  <script src="/lab.js?v=27f53bf5"></script>
+</body>
+</html>
